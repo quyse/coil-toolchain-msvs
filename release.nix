@@ -1,12 +1,13 @@
-{ pkgs ? import <nixpkgs> {}
+{ pkgs
 , toolchain
 }:
 let
-  msvs = import ./. {
+  root = import ./. {
     inherit pkgs toolchain;
   };
 in {
+  inherit root;
   touch = {
-    inherit (msvs) vs16BuildToolsCppDisk vs15BuildToolsCppDisk vs16CommunityCppDisk vs15CommunityCppDisk;
+    inherit (root) vs16BuildToolsCppDisk vs15BuildToolsCppDisk vs16CommunityCppDisk vs15CommunityCppDisk;
   };
 }
