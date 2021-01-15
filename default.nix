@@ -197,6 +197,7 @@ in rec {
   vsWorkloads = {
     vcTools = "Microsoft.VisualStudio.Workload.VCTools";
     nativeDesktop = "Microsoft.VisualStudio.Workload.NativeDesktop";
+    universal = "Microsoft.VisualStudio.Workload.Universal";
   };
 
   vsDisk = { versionMajor, product, workloads }: (vsPackages {
