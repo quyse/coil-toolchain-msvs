@@ -160,7 +160,7 @@ in rec {
     };
 
     disk = { packageIds, arch ? "x64", language ? "en-US", includeRecommended ? false, includeOptional ? false }: windows.runPackerStep {
-      disk = windows.initialDisk;
+      disk = windows.initialDisk {};
       extraMount = "work";
       extraMountOut = false;
       beforeScript = ''
