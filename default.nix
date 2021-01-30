@@ -50,6 +50,10 @@ in rec {
           (pkgs.fetchurl {
             name = pkgs.lib.strings.sanitizeDerivationName (baseNameOf fileName);
             inherit (payload) url sha256;
+            meta = {
+              # presuming everything from MS to be unfree
+              license = pkgs.lib.licenses.unfree;
+            };
           });
         depPred = depDesc:
           builtins.typeOf depDesc != "set" ||
@@ -149,14 +153,23 @@ in rec {
 
     vsBuildToolsExe = pkgs.fetchurl {
       inherit (fixeds.fetchurl."${uriPrefix}/vs_buildtools.exe") url sha256 name;
+      meta = {
+        license = pkgs.lib.licenses.unfree;
+      };
     };
 
     vsCommunityExe = pkgs.fetchurl {
       inherit (fixeds.fetchurl."${uriPrefix}/vs_community.exe") url sha256 name;
+      meta = {
+        license = pkgs.lib.licenses.unfree;
+      };
     };
 
     vsInstallerExe = pkgs.fetchurl {
       inherit (fixeds.fetchurl."${uriPrefix}/installer") url sha256 name;
+      meta = {
+        license = pkgs.lib.licenses.unfree;
+      };
     };
 
     disk = { packageIds, arch ? "x64", language ? "en-US", includeRecommended ? false, includeOptional ? false }: windows.runPackerStep {
@@ -182,6 +195,9 @@ in rec {
           ];
         }
       ];
+      meta = {
+        license = pkgs.lib.licenses.unfree;
+      };
     };
 
   in {
