@@ -93,33 +93,31 @@ in rec {
     in rec {
       id = "${packageId}-${arch}-${language}";
       variants = map packageVariantManifest packageVariants;
-      layoutScript = builtins.concatStringsSep "" (map (variant: variant.layoutScript) variants);
     };
 
     packageManifests = pkgs.lib.mapAttrs packageManifest packages;
 
     # resolve dependencies and return manifest for set of packages
     resolve = { packageIds, arch, language, includeRecommended ? false, includeOptional ? false }: let
-      dfs = package: { visited, packages } @ args: if visited."${package.id}" or false
-        then args
+      dfsPackage = package: state: pkgs.lib.foldr dfsPackageVariant state package.variants;
+      dfsPackageVariant = packageVariant: { visited, ... } @ state: if visited."${packageVariant.id}" or false
+        then state
         else let
-          depPackages = pkgs.lib.concatMap (variant: variant.dependencies) package.variants;
-          depsResult = pkgs.lib.foldr dfs {
+          depsResult = pkgs.lib.foldr dfsPackage (state // {
             visited = visited // {
-              "${package.id}" = true;
+              "${packageVariant.id}" = true;
             };
-            inherit packages;
-          } depPackages;
-        in {
+          }) packageVariant.dependencies;
+        in state // {
           inherit (depsResult) visited;
-          packages = depsResult.packages ++ [package];
+          packageVariants = depsResult.packageVariants ++ [packageVariant];
         };
-      packages = (pkgs.lib.foldr dfs {
+      packageVariants = (pkgs.lib.foldr dfsPackage {
         visited = {};
-        packages = [];
+        packageVariants = [];
       } (map (packageId: packageManifests."${normalizeVsPackageId packageId}" {
         inherit arch language includeRecommended includeOptional;
-      }) (packageIds ++ [product]))).packages;
+      }) (packageIds ++ [product]))).packageVariants;
       vsSetupExe = {
         "Microsoft.VisualStudio.Product.BuildTools" = vsBuildToolsExe;
         "Microsoft.VisualStudio.Product.Community" = vsCommunityExe;
@@ -135,7 +133,7 @@ in rec {
       });
     in {
       layoutScript = ''
-        ${builtins.concatStringsSep "" (map (package: package.layoutScript) packages)}
+        ${builtins.concatStringsSep "" (map (packageVariant: packageVariant.layoutScript) packageVariants)}
         ln -s ${channelManifest} ChannelManifest.json
         ln -s ${manifest} Catalog.json
         ln -s ${layoutJson} Layout.json
