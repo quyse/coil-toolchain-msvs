@@ -61,7 +61,7 @@ in rec {
             (includeRecommended && depDesc.type == "Recommended") ||
             (includeOptional && depDesc.type == "Optional")) &&
           (!(depDesc ? when) || pkgs.lib.any (p: p == product) depDesc.when);
-        depManifest = depPackageId: depDesc: packageManifests.${normalizeVsPackageId depPackageId} {
+        depManifest = depPackageId: depDesc: packageManifests."${normalizeVsPackageId depPackageId}" {
           arch = depDesc.chip or arch;
           inherit language;
           includeRecommended = false;
@@ -100,7 +100,7 @@ in rec {
 
     # resolve dependencies and return manifest for set of packages
     resolve = { packageIds, arch, language, includeRecommended ? false, includeOptional ? false }: let
-      dfs = package: { visited, packages } @ args: if visited.${package.id} or false
+      dfs = package: { visited, packages } @ args: if visited."${package.id}" or false
         then args
         else let
           depPackages = pkgs.lib.concatMap (variant: variant.dependencies) package.variants;
@@ -111,19 +111,19 @@ in rec {
             inherit packages;
           } depPackages;
         in {
-          visited = depsResult.visited;
+          inherit (depsResult) visited;
           packages = depsResult.packages ++ [package];
         };
       packages = (pkgs.lib.foldr dfs {
         visited = {};
         packages = [];
-      } (map (packageId: packageManifests.${packageId} {
+      } (map (packageId: packageManifests."${normalizeVsPackageId packageId}" {
         inherit arch language includeRecommended includeOptional;
-      }) (map normalizeVsPackageId (packageIds ++ [product])))).packages;
+      }) (packageIds ++ [product]))).packages;
       vsSetupExe = {
         "Microsoft.VisualStudio.Product.BuildTools" = vsBuildToolsExe;
         "Microsoft.VisualStudio.Product.Community" = vsCommunityExe;
-      }.${product};
+      }."${product}";
       layoutJson = pkgs.writeText "layout.json" (builtins.toJSON {
         inherit channelUri;
         channelId = channelManifestJSON.info.manifestName;
