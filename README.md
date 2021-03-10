@@ -1,8 +1,8 @@
 # MS Visual Studio support for Coil Toolchain
 
-Nix-based support for building with MSVS.
+Nix-based support for building with MSVS on Linux.
 
-This repo allows to build QEMU VM image with installed MSVS as sandbox-compatible Nix derivation.
+This repo allows to build QEMU VM image with installed MSVS as a sandbox-compatible Nix derivation, in fully automatic fashion.
 
 ## Implementation
 
