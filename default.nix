@@ -37,8 +37,13 @@ in rec {
       , includeRecommended
       , includeOptional
       }: let
-      packageVariantPred = packageVariant:
-        (!(packageVariant ? chip) || packageVariant.chip == "neutral" || packageVariant.chip == arch) &&
+      packageVariantPred = packageVariant: let
+        chipPred = !(packageVariant ? chip) || packageVariant.chip == "neutral" || packageVariant.chip == arch;
+      in
+        (if packageVariant ? productArch
+          then pkgs.lib.toLower packageVariant.productArch == "neutral" || pkgs.lib.toLower packageVariant.productArch == arch || chipPred
+          else chipPred
+        ) &&
         (!(packageVariant ? language) || packageVariant.language == "neutral" || packageVariant.language == language);
       packageVariants = builtins.filter packageVariantPred package;
       name = "${packageId}-${arch}-${language}${if includeRecommended then "-rec" else ""}${if includeOptional then "-opt" else ""}";
@@ -70,7 +75,10 @@ in rec {
       in rec {
         id = "${packageVariant.id},version=${packageVariant.version}" +
           (if packageVariant.chip or null != null then ",chip=${packageVariant.chip}" else "") +
-          (if packageVariant.language or null != null then ",language=${packageVariant.language}" else "");
+          (if packageVariant.language or null != null then ",language=${packageVariant.language}" else "") +
+          (if packageVariant.branch or null != null then ",branch=${packageVariant.branch}" else "") +
+          (if packageVariant.productArch or null != null then ",productarch=${packageVariant.productArch}" else "") +
+          (if packageVariant.machineArch or null != null then ",machinearch=${packageVariant.machineArch}" else "");
         # map of payloads, fileName -> fetchurl derivation
         payloads = builtins.listToAttrs (map payloadManifest (packageVariant.payloads or []));
         # list of dependencies (package manifests)
@@ -186,12 +194,7 @@ in rec {
         {
           type = "windows-shell";
           inline = [
-            ( "D:\\vslayout\\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart"
-            + (builtins.concatStringsSep "" (map (packageId: " --add ${packageId}") packageIds))
-            + (pkgs.lib.optionalString includeRecommended " --includeRecommended")
-            + (pkgs.lib.optionalString includeOptional " --includeOptional")
-            + " --addProductLang ${language}"
-            )
+            "D:\\vslayout\\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart"
           ];
           valid_exit_codes = [
             0
@@ -220,16 +223,18 @@ in rec {
     universal = "Microsoft.VisualStudio.Workload.Universal";
   };
 
-  vsDisk = { versionMajor, product, workloads }: (vsPackages {
-    inherit versionMajor;
+  vsDisk = { versionMajor, versionPreview ? false, product, workloads }: (vsPackages {
+    inherit versionMajor versionPreview;
     product = vsProducts."${product}";
   }).disk {
     packageIds = map (workload: vsWorkloads."${workload}") workloads;
     includeRecommended = true;
   };
 
+  vs17BuildToolsCppDisk = vsDisk { versionMajor = 17; versionPreview = true; product = "buildTools"; workloads = ["vcTools"]; };
   vs16BuildToolsCppDisk = vsDisk { versionMajor = 16; product = "buildTools"; workloads = ["vcTools"]; };
   vs15BuildToolsCppDisk = vsDisk { versionMajor = 15; product = "buildTools"; workloads = ["vcTools"]; };
+  vs17CommunityCppDisk = vsDisk { versionMajor = 17; versionPreview = true; product = "community"; workloads = ["nativeDesktop"]; };
   vs16CommunityCppDisk = vsDisk { versionMajor = 16; product = "community"; workloads = ["nativeDesktop"]; };
   vs15CommunityCppDisk = vsDisk { versionMajor = 15; product = "community"; workloads = ["nativeDesktop"]; };
 
