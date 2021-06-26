@@ -186,10 +186,16 @@ in rec {
         {
           type = "windows-shell";
           inline = [
-            ("D:\\vslayout\\vs_setup.exe --quiet --wait --noweb --norestart" +
-              (builtins.concatStringsSep "" (map (packageId: " --add ${packageId}") packageIds)) +
-              (pkgs.lib.optionalString includeRecommended " --includeRecommended") +
-              (pkgs.lib.optionalString includeOptional " --includeOptional"))
+            ( "D:\\vslayout\\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart"
+            + (builtins.concatStringsSep "" (map (packageId: " --add ${packageId}") packageIds))
+            + (pkgs.lib.optionalString includeRecommended " --includeRecommended")
+            + (pkgs.lib.optionalString includeOptional " --includeOptional")
+            + " --addProductLang ${language}"
+            )
+          ];
+          valid_exit_codes = [
+            0
+            3010 # success but reboot required
           ];
         }
       ];
