@@ -238,5 +238,16 @@ in rec {
   vs16CommunityCppDisk = vsDisk { versionMajor = 16; product = "community"; workloads = ["nativeDesktop"]; };
   vs15CommunityCppDisk = vsDisk { versionMajor = 15; product = "community"; workloads = ["nativeDesktop"]; };
 
-  fixeds = builtins.fromJSON (builtins.readFile ./fixeds.json);
+  fixeds = pkgs.lib.importJSON ./fixeds.json;
+
+  touch = {
+    inherit
+      vs17BuildToolsCppDisk
+      vs16BuildToolsCppDisk
+      vs15BuildToolsCppDisk
+      # vs17CommunityCppDisk # does not work yet
+      vs16CommunityCppDisk
+      vs15CommunityCppDisk
+    ;
+  };
 }
