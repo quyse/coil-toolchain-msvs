@@ -245,7 +245,7 @@ in rec {
       vs17BuildToolsCppDisk
       vs16BuildToolsCppDisk
       vs15BuildToolsCppDisk
-      # vs17CommunityCppDisk # does not work yet
+      vs17CommunityCppDisk
       vs16CommunityCppDisk
       vs15CommunityCppDisk
     ;
