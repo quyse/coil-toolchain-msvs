@@ -68,7 +68,9 @@ in rec {
             (includeRecommended && depDesc.type == "Recommended") ||
             (includeOptional && depDesc.type == "Optional")) &&
           (!(depDesc ? when) || lib.any (p: p == product) depDesc.when);
-        depManifest = depPackageId: depDesc: packageManifests."${normalizeVsPackageId depPackageId}" {
+        depManifest = depKey: depDesc: let
+          depPackageId = normalizeVsPackageId (depDesc.id or depKey);
+        in packageManifests."${depPackageId}" {
           arch = depDesc.chip or arch;
           inherit language;
           includeRecommended = false;
@@ -184,7 +186,7 @@ in rec {
       '';
       provisioners = [
         {
-          type = "windows-shell";
+          type = "powershell";
           inline = [
             "D:\\vslayout\\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart"
           ];
