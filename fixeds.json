@@ -14,20 +14,6 @@
       "sha256": "03gxz920z4slab31yq0pwf2si1wx0sk202kcr185gb266lhmf09k",
       "url": "https://download.visualstudio.microsoft.com/download/pr/9fd4bbc6-1a89-4d06-9808-7e30530c2a7b/330157213546AC5750C86C0A20A6069D87A885E317601FC65254930F44FAFD0D/vs_installer.opc"
     },
-    "https://aka.ms/vs/15/release/vs_buildtools.exe": {
-      "etag": "\"c288aabd1184d71:0\"",
-      "last-modified": "Thu, 29 Jul 2021 00:36:16 GMT",
-      "name": "vs_BuildTools.exe",
-      "sha256": "0ajcvi56h2220h6vykbn2g6pcwr58vq1pnfsqm1lppzrm80brmhy",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/343898a7-7d12-4faa-b5df-958b31e57b3e/1ed6bc00aaf9df4b43c5dad91bf046257376cd13764dbf0d044208684adc4c2a/vs_BuildTools.exe"
-    },
-    "https://aka.ms/vs/15/release/vs_community.exe": {
-      "etag": "\"ec32ecb31184d71:0\"",
-      "last-modified": "Thu, 29 Jul 2021 00:35:59 GMT",
-      "name": "vs_Community.exe",
-      "sha256": "1ny74xdzn895y3499maaqxb2rzzbl3l03lnzw43lv2iw099yn5qf",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/343898a7-7d12-4faa-b5df-958b31e57b3e/0e17eb53023c8a4d07e1dfd201e8a0ebff2c56c74ad594c8f02521fb5b27c7db/vs_Community.exe"
-    },
     "https://aka.ms/vs/16/release/channel": {
       "etag": "\"b4a529516b8ad71:0\"",
       "last-modified": "Fri, 06 Aug 2021 02:32:35 GMT",
@@ -42,20 +28,6 @@
       "sha256": "03gxz920z4slab31yq0pwf2si1wx0sk202kcr185gb266lhmf09k",
       "url": "https://download.visualstudio.microsoft.com/download/pr/9fd4bbc6-1a89-4d06-9808-7e30530c2a7b/330157213546AC5750C86C0A20A6069D87A885E317601FC65254930F44FAFD0D/vs_installer.opc"
     },
-    "https://aka.ms/vs/16/release/vs_buildtools.exe": {
-      "etag": "\"5e98c4df678ad71:0\"",
-      "last-modified": "Fri, 06 Aug 2021 02:07:57 GMT",
-      "name": "vs_BuildTools.exe",
-      "sha256": "1cby67xnk8f469cd2fmx5ck7j8cs0xhpdqmhrbfd69rfzmg5qydm",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/45dfa82b-c1f8-4c27-a5a0-1fa7a864ae21/b5795c5efd2e27d3dccab0e27661079a2179262bbd3ad15832c4a169fb317eb1/vs_BuildTools.exe"
-    },
-    "https://aka.ms/vs/16/release/vs_community.exe": {
-      "etag": "\"fe5c1acb678ad71:0\"",
-      "last-modified": "Fri, 06 Aug 2021 02:07:22 GMT",
-      "name": "vs_Community.exe",
-      "sha256": "198g1wxh3l3k0lzn18clllwp63dsmq7q8h2f96147z91266pmmwx",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/45dfa82b-c1f8-4c27-a5a0-1fa7a864ae21/9dd77a8d1121fd4382494e40840faeba0d7339a594a1603f0573d0013b0f0fa5/vs_Community.exe"
-    },
     "https://aka.ms/vs/17/pre/channel": {
       "etag": "\"b9df6233827ed71:0\"",
       "last-modified": "Wed, 21 Jul 2021 22:46:10 GMT",
@@ -69,20 +41,6 @@
       "name": "vs_installer.opc",
       "sha256": "1yhlci1dgqsm1b3iaifhbsk9bkxrxb4hmbpqzg98qyb6ima8qlff",
       "url": "https://download.visualstudio.microsoft.com/download/pr/4a4a6d27-b41f-4b60-8070-744f22806544/CE518C548D66798CD2FBF8AE0AC9EAB9CF95A65ED04515C70A55E3D7426414FA/vs_installer.opc"
-    },
-    "https://aka.ms/vs/17/pre/vs_buildtools.exe": {
-      "etag": "\"303e2580807ed71:0\"",
-      "last-modified": "Wed, 21 Jul 2021 22:34:00 GMT",
-      "name": "vs_BuildTools.exe",
-      "sha256": "1rv3vibak1xdyl8dnyvp23dd1dp1n7h33f2fmrf31kwibi03sb8f",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/4a4a6d27-b41f-4b60-8070-744f22806544/0e2d3d405c91cf305cae4eb831e0b1e1b6d0da10777bdb10f5ad87a956dc63e7/vs_BuildTools.exe"
-    },
-    "https://aka.ms/vs/17/pre/vs_community.exe": {
-      "etag": "\"9532cb69807ed71:0\"",
-      "last-modified": "Wed, 21 Jul 2021 22:33:22 GMT",
-      "name": "vs_Community.exe",
-      "sha256": "027z8y52h5w3szkj1xk43z6xs1ffiw0ybv6jpn6lzl8b7r469r68",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/4a4a6d27-b41f-4b60-8070-744f22806544/c8e464483e0bd14f8dbdd2ece5018fce05ddcd1f64f620e7d78317288a47ff08/vs_Community.exe"
     },
     "https://download.visualstudio.microsoft.com/download/pr/4a4a6d27-b41f-4b60-8070-744f22806544/2430425e7d3b7eacd508e34083e29458a3f92ea6c1de22d86437423bb7dcb7cb/VisualStudioPreview.vsman": {
       "etag": "\"b2ec834827ed71:0\"",

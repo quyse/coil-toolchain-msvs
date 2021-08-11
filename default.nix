@@ -126,10 +126,6 @@ in rec {
       } (map (packageId: packageManifests."${normalizeVsPackageId packageId}" {
         inherit arch language includeRecommended includeOptional;
       }) (packageIds ++ [product]))).packageVariants;
-      vsSetupExe = {
-        "Microsoft.VisualStudio.Product.BuildTools" = vsBuildToolsExe;
-        "Microsoft.VisualStudio.Product.Community" = vsCommunityExe;
-      }."${product}";
       layoutJson = pkgs.writeText "layout.json" (builtins.toJSON {
         inherit channelUri;
         channelId = channelManifestJSON.info.manifestName;
@@ -151,24 +147,10 @@ in rec {
       '';
     };
 
-    # bootstrapper (vs_Setup.exe) - not sure what it is for
-    # vsSetupExeDesc = builtins.head (pkgs.lib.findSingle (c: c.type == "Bootstrapper") null null channelManifestJSON.channelItems).payloads;
-    # vsSetupExe = pkgs.fetchurl {
-    #   inherit (vsSetupExeDesc) url sha256;
-    # };
-
-    vsBuildToolsExe = pkgs.fetchurl {
-      inherit (fixeds.fetchurl."${uriPrefix}/vs_buildtools.exe") url sha256 name;
-      meta = {
-        license = pkgs.lib.licenses.unfree;
-      };
-    };
-
-    vsCommunityExe = pkgs.fetchurl {
-      inherit (fixeds.fetchurl."${uriPrefix}/vs_community.exe") url sha256 name;
-      meta = {
-        license = pkgs.lib.licenses.unfree;
-      };
+    vsSetupExeDesc = builtins.head (pkgs.lib.findSingle (c: c.type == "Bootstrapper") null null channelManifestJSON.channelItems).payloads;
+    vsSetupExe = pkgs.fetchurl {
+      inherit (vsSetupExeDesc) url sha256;
+      name = vsSetupExeDesc.fileName;
     };
 
     vsInstallerExe = pkgs.fetchurl {
