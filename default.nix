@@ -170,6 +170,7 @@ in rec {
     };
 
     disk = { packageIds, arch ? "x64", language ? "en-US", includeRecommended ? false, includeOptional ? false }: windows.runPackerStep {
+      name = "msvs-${toString versionMajor}-${product}";
       disk = windows.initialDisk {};
       extraMount = "work";
       extraMountOut = false;
