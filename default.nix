@@ -6,6 +6,8 @@
     inherit pkgs;
   };
 
+  inherit (pkgs) lib;
+
 in rec {
   # Nix-based package downloader for Visual Studio
   # inspiration: https://github.com/mstorsjo/msvc-wine/blob/master/vsdownload.py
@@ -17,9 +19,9 @@ in rec {
     channelManifest = pkgs.fetchurl {
       inherit (fixeds.fetchurl."${channelUri}") url sha256 name;
     };
-    channelManifestJSON = builtins.fromJSON (builtins.readFile channelManifest);
+    channelManifestJSON = lib.importJSON channelManifest;
 
-    manifestDesc = builtins.head (pkgs.lib.findSingle (c: c.type == "Manifest") null null channelManifestJSON.channelItems).payloads;
+    manifestDesc = builtins.head (lib.findSingle (c: c.type == "Manifest") null null channelManifestJSON.channelItems).payloads;
     # size, sha256 are actually wrong for manifest (facepalm)
     # manifest = pkgs.fetchurl {
     #   inherit (manifestDesc) url sha256;
@@ -27,9 +29,9 @@ in rec {
     manifest = pkgs.fetchurl {
       inherit (fixeds.fetchurl."${manifestDesc.url}") url sha256 name;
     };
-    manifestJSON = builtins.fromJSON (builtins.readFile manifest);
+    manifestJSON = lib.importJSON manifest;
 
-    packages = pkgs.lib.groupBy (package: normalizeVsPackageId package.id) manifestJSON.packages;
+    packages = lib.groupBy (package: normalizeVsPackageId package.id) manifestJSON.packages;
 
     packageManifest = packageId: package:
       { arch
@@ -41,7 +43,7 @@ in rec {
         chipPred = !(packageVariant ? chip) || packageVariant.chip == "neutral" || packageVariant.chip == arch;
       in
         (if packageVariant ? productArch
-          then pkgs.lib.toLower packageVariant.productArch == "neutral" || pkgs.lib.toLower packageVariant.productArch == arch || chipPred
+          then lib.toLower packageVariant.productArch == "neutral" || lib.toLower packageVariant.productArch == arch || chipPred
           else chipPred
         ) &&
         (!(packageVariant ? language) || packageVariant.language == "neutral" || packageVariant.language == language);
@@ -50,14 +52,14 @@ in rec {
       packageVariantManifest = packageVariant: let
         payloadManifest = payload: let
           fileName = builtins.replaceStrings ["\\"] ["/"] payload.fileName;
-        in pkgs.lib.nameValuePair
+        in lib.nameValuePair
           (if packageVariant.type == "Vsix" then "payload.vsix" else fileName)
           (pkgs.fetchurl {
-            name = pkgs.lib.strings.sanitizeDerivationName (baseNameOf fileName);
+            name = lib.strings.sanitizeDerivationName (baseNameOf fileName);
             inherit (payload) url sha256;
             meta = {
               # presuming everything from MS to be unfree
-              license = pkgs.lib.licenses.unfree;
+              license = lib.licenses.unfree;
             };
           });
         depPred = depDesc:
@@ -65,7 +67,7 @@ in rec {
           (!(depDesc ? type) ||
             (includeRecommended && depDesc.type == "Recommended") ||
             (includeOptional && depDesc.type == "Optional")) &&
-          (!(depDesc ? when) || pkgs.lib.any (p: p == product) depDesc.when);
+          (!(depDesc ? when) || lib.any (p: p == product) depDesc.when);
         depManifest = depPackageId: depDesc: packageManifests."${normalizeVsPackageId depPackageId}" {
           arch = depDesc.chip or arch;
           inherit language;
@@ -80,21 +82,28 @@ in rec {
           (if packageVariant.productArch or null != null then ",productarch=${packageVariant.productArch}" else "") +
           (if packageVariant.machineArch or null != null then ",machinearch=${packageVariant.machineArch}" else "");
         # map of payloads, fileName -> fetchurl derivation
-        payloads = builtins.listToAttrs (map payloadManifest (packageVariant.payloads or []));
+        payloads = lib.pipe (packageVariant.payloads or []) [
+          (map payloadManifest)
+          builtins.listToAttrs
+        ];
         # list of dependencies (package manifests)
-        dependencies = pkgs.lib.mapAttrsToList depManifest (pkgs.lib.filterAttrs (_dep: depPred) (packageVariant.dependencies or {}));
+        dependencies = lib.pipe (packageVariant.dependencies or {}) [
+          (lib.filterAttrs (_dep: depPred))
+          (lib.mapAttrsToList depManifest)
+        ];
         layoutScript = let
           dir = id;
-          directories = pkgs.lib.sort (a: b: a < b) (pkgs.lib.unique (
-            pkgs.lib.mapAttrsToList (fileName: _payload:
+          directories = lib.pipe payloads [
+            (lib.mapAttrsToList (fileName: _payload:
               dirOf "${dir}/${fileName}"
-            ) payloads
-          ));
-          directoriesStr = builtins.concatStringsSep " " (map (directory: pkgs.lib.escapeShellArg directory) directories);
+            ))
+            lib.unique
+            (lib.sort (a: b: a < b))
+          ];
         in ''
-          ${if directoriesStr != "" then "mkdir -p ${directoriesStr}" else ""}
-          ${builtins.concatStringsSep "" (pkgs.lib.mapAttrsToList (fileName: payload: ''
-            ln -s ${payload} ${pkgs.lib.escapeShellArg "${dir}/${fileName}"}
+          ${lib.optionalString (lib.length directories > 0) "mkdir -p ${lib.escapeShellArgs directories}"}
+          ${lib.concatStrings (lib.mapAttrsToList (fileName: payload: ''
+            ln -s ${payload} ${lib.escapeShellArg "${dir}/${fileName}"}
           '') payloads)}
         '';
       };
@@ -103,15 +112,15 @@ in rec {
       variants = map packageVariantManifest packageVariants;
     };
 
-    packageManifests = pkgs.lib.mapAttrs packageManifest packages;
+    packageManifests = lib.mapAttrs packageManifest packages;
 
     # resolve dependencies and return manifest for set of packages
     resolve = { packageIds, arch, language, includeRecommended ? false, includeOptional ? false }: let
-      dfsPackage = package: state: pkgs.lib.foldr dfsPackageVariant state package.variants;
+      dfsPackage = package: state: lib.foldr dfsPackageVariant state package.variants;
       dfsPackageVariant = packageVariant: { visited, ... } @ state: if visited."${packageVariant.id}" or false
         then state
         else let
-          depsResult = pkgs.lib.foldr dfsPackage (state // {
+          depsResult = lib.foldr dfsPackage (state // {
             visited = visited // {
               "${packageVariant.id}" = true;
             };
@@ -120,7 +129,7 @@ in rec {
           inherit (depsResult) visited;
           packageVariants = depsResult.packageVariants ++ [packageVariant];
         };
-      packageVariants = (pkgs.lib.foldr dfsPackage {
+      packageVariants = (lib.foldr dfsPackage {
         visited = {};
         packageVariants = [];
       } (map (packageId: packageManifests."${normalizeVsPackageId packageId}" {
@@ -132,7 +141,7 @@ in rec {
         productId = product;
         installChannelUri = ".\\ChannelManifest.json";
         installCatalogUri = ".\\Catalog.json";
-        add = map (packageId: "${packageId}${pkgs.lib.optionalString includeRecommended ";includeRecommended"}${pkgs.lib.optionalString includeOptional ";includeOptional"}") packageIds;
+        add = map (packageId: "${packageId}${lib.optionalString includeRecommended ";includeRecommended"}${lib.optionalString includeOptional ";includeOptional"}") packageIds;
         addProductLang = [language];
       });
     in {
@@ -147,7 +156,7 @@ in rec {
       '';
     };
 
-    vsSetupExeDesc = builtins.head (pkgs.lib.findSingle (c: c.type == "Bootstrapper") null null channelManifestJSON.channelItems).payloads;
+    vsSetupExeDesc = builtins.head (lib.findSingle (c: c.type == "Bootstrapper") null null channelManifestJSON.channelItems).payloads;
     vsSetupExe = pkgs.fetchurl {
       inherit (vsSetupExeDesc) url sha256;
       name = vsSetupExeDesc.fileName;
@@ -156,7 +165,7 @@ in rec {
     vsInstallerExe = pkgs.fetchurl {
       inherit (fixeds.fetchurl."${uriPrefix}/installer") url sha256 name;
       meta = {
-        license = pkgs.lib.licenses.unfree;
+        license = lib.licenses.unfree;
       };
     };
 
@@ -185,7 +194,7 @@ in rec {
         }
       ];
       meta = {
-        license = pkgs.lib.licenses.unfree;
+        license = lib.licenses.unfree;
       };
     };
 
@@ -193,7 +202,7 @@ in rec {
     inherit packageManifests resolve disk;
   };
 
-  normalizeVsPackageId = pkgs.lib.toLower;
+  normalizeVsPackageId = lib.toLower;
 
   vsProducts = {
     buildTools = "Microsoft.VisualStudio.Product.BuildTools";
@@ -220,7 +229,7 @@ in rec {
   vs16CommunityCppDisk = vsDisk { versionMajor = 16; product = "community"; workloads = ["nativeDesktop"]; };
   vs15CommunityCppDisk = vsDisk { versionMajor = 15; product = "community"; workloads = ["nativeDesktop"]; };
 
-  fixeds = pkgs.lib.importJSON ./fixeds.json;
+  fixeds = lib.importJSON ./fixeds.json;
 
   touch = {
     inherit
