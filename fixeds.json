@@ -59,7 +59,7 @@
       "url": "https://download.visualstudio.microsoft.com/download/pr/5d8aa6a6-a327-4f02-9332-d636c3cd80dd/77f98386f5c42e6d73af6e64153bdf98db1339e408b815da65a55e9c9b3f6ac2/VisualStudio.vsman"
     },
     "https://download.visualstudio.microsoft.com/download/pr/769c1952-e037-40ec-b7fb-7925ee16b0a1/8a93d02ec534f3ef0cd98029d5850adb43b15047e70519b2989bfa938c64dbbf/VisualStudioPreview.vsman": {
-      "comment": "17.0.0 Preview 4",
+      "comment": "17.0.0 Preview 4.0",
       "etag": "\"1011773328a6d71:0\"",
       "last-modified": "Fri, 10 Sep 2021 09:42:42 GMT",
       "name": "VisualStudioPreview.vsman",

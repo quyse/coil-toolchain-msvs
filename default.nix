@@ -1,17 +1,18 @@
-{ pkgs
+{ pkgs ? import <nixpkgs> {}
 , toolchain
+, lib ? pkgs.lib
+, fixedsFile ? ./fixeds.json
+, fixeds ? lib.importJSON fixedsFile
 }: let
 
   windows = toolchain.windows {
     inherit pkgs;
   };
 
-  inherit (pkgs) lib;
-
 in rec {
   # Nix-based package downloader for Visual Studio
   # inspiration: https://github.com/mstorsjo/msvc-wine/blob/master/vsdownload.py
-  vsPackages = { versionMajor, versionPreview ? false, product }: let
+  vsPackages = { versionMajor, versionPreview ? false, product }: rec {
 
     uriPrefix = "https://aka.ms/vs/${toString versionMajor}/${if versionPreview then "pre" else "release"}";
 
@@ -201,8 +202,6 @@ in rec {
       };
     };
 
-  in {
-    inherit packageManifests resolve disk;
   };
 
   normalizeVsPackageId = lib.toLower;
@@ -225,23 +224,80 @@ in rec {
     includeRecommended = true;
   };
 
-  vs17BuildToolsCppDisk = vsDisk { versionMajor = 17; versionPreview = true; product = "buildTools"; workloads = ["vcTools"]; };
-  vs16BuildToolsCppDisk = vsDisk { versionMajor = 16; product = "buildTools"; workloads = ["vcTools"]; };
-  vs15BuildToolsCppDisk = vsDisk { versionMajor = 15; product = "buildTools"; workloads = ["vcTools"]; };
-  vs17CommunityCppDisk = vsDisk { versionMajor = 17; versionPreview = true; product = "community"; workloads = ["nativeDesktop"]; };
-  vs16CommunityCppDisk = vsDisk { versionMajor = 16; product = "community"; workloads = ["nativeDesktop"]; };
-  vs15CommunityCppDisk = vsDisk { versionMajor = 15; product = "community"; workloads = ["nativeDesktop"]; };
+  trackedVersions = [
+    { versionMajor = 17; versionPreview = true; }
+    { versionMajor = 16; }
+    { versionMajor = 15; }
+  ];
 
-  fixeds = lib.importJSON ./fixeds.json;
+  trackedProducts = [
+    { product = "buildTools"; workloads = ["vcTools"]; }
+    { product = "community"; workloads = ["nativeDesktop"]; }
+  ];
 
-  touch = {
-    inherit
-      vs17BuildToolsCppDisk
-      vs16BuildToolsCppDisk
-      vs15BuildToolsCppDisk
-      vs17CommunityCppDisk
-      vs16CommunityCppDisk
-      vs15CommunityCppDisk
-    ;
+  trackedVariants = lib.concatMap (version: map (product: version // product) trackedProducts) trackedVersions;
+
+  trackedDisks = lib.pipe trackedVariants [
+    (map (variant: lib.nameValuePair
+      "vs${toString variant.versionMajor}${variant.product}Disk"
+      (vsDisk variant)
+    ))
+    lib.listToAttrs
+  ];
+
+  updateFixedsManifests = let
+    changes = lib.pipe trackedVersions [
+      (map (version: let
+        packages = vsPackages (version // { product = null; });
+      in lib.nameValuePair (toString version.versionMajor) {
+        url = packages.manifestDesc.url;
+        comment = packages.channelManifestJSON.info.productDisplayVersion;
+      }))
+      lib.listToAttrs
+    ];
+    changeForObj = obj: let
+      commentParts = lib.splitString "." (obj.comment or "");
+    in changes."${lib.head commentParts}" or null;
+    newFixeds = fixeds // {
+      fetchurl = lib.mapAttrs' (url: obj: let
+        change = changeForObj obj;
+      in if change != null then lib.nameValuePair change.url (obj // {
+        inherit (change) comment;
+      }) else lib.nameValuePair url obj) fixeds.fetchurl;
+    };
+    newFixedsFile = pkgs.writeText "fixeds.json" (builtins.toJSON newFixeds);
+    totalComment = lib.pipe fixeds.fetchurl [
+      lib.attrValues
+      (map (obj: let
+        change = changeForObj obj;
+      in if change != null && change.comment != obj.comment
+        then "msvs ${change.comment}"
+        else null
+      ))
+      (lib.filter (comment: comment != null))
+      (lib.sort lib.versionOlder)
+      (lib.concatStringsSep ", ")
+    ];
+  in pkgs.runCommand "updateFixedsManifests" {} ''
+    mkdir $out
+    cp ${newFixedsFile} $out/fixeds.json
+    ${lib.optionalString (totalComment != "") "echo ${lib.escapeShellArg totalComment} > $out/.git-commit"}
+  '';
+
+  autoUpdateScript = pkgs.writeShellScript "toolchain_msvs_auto_update" ''
+    set -e
+    shopt -s dotglob
+    cp --no-preserve=mode ${fixedsFile} ./fixeds.json
+    ${toolchain.refreshFixedsScript}
+    if ! cmp -s ${fixedsFile} ./fixeds.json
+    then
+      NEW_FIXEDS=$(nix-build -QA updateFixedsManifests ${./default.nix} --arg toolchain null --arg fixedsFile ./fixeds.json --no-out-link)
+      cp --no-preserve=mode ''${NEW_FIXEDS:?failed to get new fixeds}/* ./
+      ${toolchain.refreshFixedsScript}
+    fi
+  '';
+
+  touch = trackedDisks // {
+    inherit autoUpdateScript;
   };
 }
