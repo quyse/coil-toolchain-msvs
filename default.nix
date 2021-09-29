@@ -281,7 +281,7 @@ in rec {
   in pkgs.runCommand "updateFixedsManifests" {} ''
     mkdir $out
     cp ${newFixedsFile} $out/fixeds.json
-    ${lib.optionalString (totalComment != "") "echo ${lib.escapeShellArg totalComment} > $out/.git-commit"}
+    echo ${lib.escapeShellArg (if totalComment == "" then "update fixeds" else totalComment)} > $out/.git-commit
   '';
 
   autoUpdateScript = pkgs.writeShellScript "toolchain_msvs_auto_update" ''
