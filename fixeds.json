@@ -15,8 +15,8 @@
       "url": "https://download.visualstudio.microsoft.com/download/pr/9fd4bbc6-1a89-4d06-9808-7e30530c2a7b/330157213546AC5750C86C0A20A6069D87A885E317601FC65254930F44FAFD0D/vs_installer.opc"
     },
     "https://aka.ms/vs/16/release/channel": {
-      "etag": "\"7f7081662a0d71:0\"",
-      "last-modified": "Fri, 03 Sep 2021 01:21:30 GMT",
+      "etag": "\"dc6e33d361a0d71:0\"",
+      "last-modified": "Fri, 03 Sep 2021 01:20:04 GMT",
       "name": "VisualStudio.16.Release.chman",
       "sha256": "1axif21jbh16p1ccg9krl3drmvg3dpyzln7wcv4xn7fclyvmkw25",
       "url": "https://download.visualstudio.microsoft.com/download/pr/22c17f05-944c-48dc-9f68-b1663f9df4cb/f6ab79867bff573219e8e3879659a50ab54735fd7063aa6f3d815f01f07e4b53/VisualStudio.16.Release.chman"
