@@ -22,22 +22,22 @@
       "url": "https://download.visualstudio.microsoft.com/download/pr/1051e775-b2c9-4b7a-a227-1e60bffe102a/601f8d08596bb8a2b522d3b5f972fb30654bf925e4aa667b03aeaa3689e40ea2/VisualStudio.16.Release.chman"
     },
     "https://aka.ms/vs/16/release/installer": {
-      "etag": "\"b9d475379a9bd71:0\"",
-      "last-modified": "Fri, 27 Aug 2021 23:21:08 GMT",
+      "etag": "\"306470f6999bd71:0\"",
+      "last-modified": "Fri, 27 Aug 2021 23:19:19 GMT",
       "name": "vs_installer.opc",
       "sha256": "1wn61sshz0qixfxgr5fp3lzf86pg725aqvcv907mnw15w9fq6kv9",
       "url": "https://download.visualstudio.microsoft.com/download/pr/f0e4b6f3-62d7-4152-a9b4-32b4f18d5eaa/694F835DE225705B0F489B6DAC8A38EF1AE43E1DD795FCBAEB11830FB50EC6F2/vs_installer.opc"
     },
     "https://aka.ms/vs/17/pre/channel": {
-      "etag": "\"60bf9258f2abd71:0\"",
-      "last-modified": "Fri, 17 Sep 2021 18:32:18 GMT",
+      "etag": "\"96dde63cf2abd71:0\"",
+      "last-modified": "Fri, 17 Sep 2021 18:31:32 GMT",
       "name": "VisualStudio.17.Preview.chman",
       "sha256": "1aaiqqx0rzbmi4xshx453g6ikanrsidqh1gqk3a4n0lc6fm5hrr0",
       "url": "https://download.visualstudio.microsoft.com/download/pr/e0f24b9d-54f6-4610-ac8d-93bb8dd7536f/8d7be0fa273b8c87907cb6b9e724e153b2230ec15b908b510abfa66d9ee4e4ca/VisualStudio.17.Preview.chman"
     },
     "https://aka.ms/vs/17/pre/installer": {
-      "etag": "\"56a3474ac3a5d71:0\"",
-      "last-modified": "Thu, 09 Sep 2021 21:40:21 GMT",
+      "etag": "\"9660ddcc3a5d71:0\"",
+      "last-modified": "Thu, 09 Sep 2021 21:38:38 GMT",
       "name": "vs_installer.opc",
       "sha256": "0l5vlbp32qdc4y31wkhz1191878jrxnp49jbb2cqbw889m58rhpg",
       "url": "https://download.visualstudio.microsoft.com/download/pr/e0f24b9d-54f6-4610-ac8d-93bb8dd7536f/EFC28C4A4D08F18599584B26726DCF121D1452081F4E1E8627AC6131EEA2BB50/vs_installer.opc"
