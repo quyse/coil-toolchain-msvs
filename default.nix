@@ -22,7 +22,7 @@ in rec {
     };
     channelManifestJSON = lib.importJSON channelManifest;
 
-    manifestDesc = builtins.head (lib.findSingle (c: c.type == "Manifest") null null channelManifestJSON.channelItems).payloads;
+    manifestDesc = lib.head (lib.findSingle (c: c.type == "Manifest") null null channelManifestJSON.channelItems).payloads;
     # size, sha256 are actually wrong for manifest (facepalm)
     # manifest = pkgs.fetchurl {
     #   inherit (manifestDesc) url sha256;
@@ -48,11 +48,11 @@ in rec {
           else chipPred
         ) &&
         (!(packageVariant ? language) || packageVariant.language == "neutral" || packageVariant.language == language);
-      packageVariants = builtins.filter packageVariantPred package;
+      packageVariants = lib.filter packageVariantPred package;
       name = "${packageId}-${arch}-${language}${if includeRecommended then "-rec" else ""}${if includeOptional then "-opt" else ""}";
       packageVariantManifest = packageVariant: let
         payloadManifest = payload: let
-          fileName = builtins.replaceStrings ["\\"] ["/"] payload.fileName;
+          fileName = lib.replaceStrings ["\\"] ["/"] payload.fileName;
         in lib.nameValuePair
           (if packageVariant.type == "Vsix" then "payload.vsix" else fileName)
           (pkgs.fetchurl {
@@ -87,7 +87,7 @@ in rec {
         # map of payloads, fileName -> fetchurl derivation
         payloads = lib.pipe (packageVariant.payloads or []) [
           (map payloadManifest)
-          builtins.listToAttrs
+          lib.listToAttrs
         ];
         # list of dependencies (package manifests)
         dependencies = lib.pipe (packageVariant.dependencies or {}) [
@@ -149,7 +149,7 @@ in rec {
       });
     in {
       layoutScript = ''
-        ${builtins.concatStringsSep "" (map (packageVariant: packageVariant.layoutScript) packageVariants)}
+        ${lib.concatStringsSep "" (map (packageVariant: packageVariant.layoutScript) packageVariants)}
         ln -s ${channelManifest} ChannelManifest.json
         ln -s ${manifest} Catalog.json
         ln -s ${layoutJson} Layout.json
@@ -159,7 +159,7 @@ in rec {
       '';
     };
 
-    vsSetupExeDesc = builtins.head (lib.findSingle (c: c.type == "Bootstrapper") null null channelManifestJSON.channelItems).payloads;
+    vsSetupExeDesc = lib.head (lib.findSingle (c: c.type == "Bootstrapper") null null channelManifestJSON.channelItems).payloads;
     vsSetupExe = pkgs.fetchurl {
       inherit (vsSetupExeDesc) url sha256;
       name = vsSetupExeDesc.fileName;
