@@ -12,7 +12,7 @@
 in rec {
   # Nix-based package downloader for Visual Studio
   # inspiration: https://github.com/mstorsjo/msvc-wine/blob/master/vsdownload.py
-  vsPackages = { versionMajor, versionPreview ? false, product }: rec {
+  vsPackages = { versionMajor, versionPreview ? false }: rec {
 
     uriPrefix = "https://aka.ms/vs/${toString versionMajor}/${if versionPreview then "pre" else "release"}";
 
@@ -34,91 +34,91 @@ in rec {
 
     packages = lib.groupBy (package: normalizeVsPackageId package.id) manifestJSON.packages;
 
-    packageManifest = packageId: package:
-      { arch
-      , language
-      , includeRecommended
-      , includeOptional
-      }: let
-      packageVariantPred = packageVariant: let
-        chipPred = !(packageVariant ? chip) || packageVariant.chip == "neutral" || packageVariant.chip == arch;
-      in
-        (if packageVariant ? productArch
-          then lib.toLower packageVariant.productArch == "neutral" || lib.toLower packageVariant.productArch == arch || chipPred
-          else chipPred
-        ) &&
-        (!(packageVariant ? language) || packageVariant.language == "neutral" || packageVariant.language == language);
-      packageVariants = lib.filter packageVariantPred package;
-      name = "${packageId}-${arch}-${language}${if includeRecommended then "-rec" else ""}${if includeOptional then "-opt" else ""}";
-      packageVariantManifest = packageVariant: let
-        payloadManifest = payload: let
-          fileName = lib.replaceStrings ["\\"] ["/"] payload.fileName;
-        in lib.nameValuePair
-          (if packageVariant.type == "Vsix" then "payload.vsix" else fileName)
-          (pkgs.fetchurl {
-            name = lib.strings.sanitizeDerivationName (baseNameOf fileName);
-            inherit (payload) url sha256;
-            meta = {
-              # presuming everything from MS to be unfree
-              license = lib.licenses.unfree;
-            };
-          });
-        depPred = depDesc:
-          builtins.typeOf depDesc != "set" ||
-          (!(depDesc ? type) ||
-            (includeRecommended && depDesc.type == "Recommended") ||
-            (includeOptional && depDesc.type == "Optional")) &&
-          (!(depDesc ? when) || lib.any (p: p == product) depDesc.when);
-        depManifest = depKey: depDesc: let
-          depPackageId = normalizeVsPackageId (depDesc.id or depKey);
-        in packageManifests."${depPackageId}" {
-          arch = depDesc.chip or arch;
-          inherit language;
-          includeRecommended = false;
-          includeOptional = false;
+    # resolve dependencies and return manifest for set of packages
+    resolve = { product, packageIds, arch ? "x64", language ? "en-US", includeRecommended ? false, includeOptional ? false }: let
+      packageManifest = packageId: package:
+        { arch
+        , language
+        , includeRecommended
+        , includeOptional
+        }: let
+        packageVariantPred = packageVariant: let
+          chipPred = !(packageVariant ? chip) || packageVariant.chip == "neutral" || packageVariant.chip == arch;
+        in
+          (if packageVariant ? productArch
+            then lib.toLower packageVariant.productArch == "neutral" || lib.toLower packageVariant.productArch == arch || chipPred
+            else chipPred
+          ) &&
+          (!(packageVariant ? language) || packageVariant.language == "neutral" || packageVariant.language == language);
+        packageVariants = lib.filter packageVariantPred package;
+        name = "${packageId}-${arch}-${language}${if includeRecommended then "-rec" else ""}${if includeOptional then "-opt" else ""}";
+        packageVariantManifest = packageVariant: let
+          payloadManifest = payload: let
+            fileName = lib.replaceStrings ["\\"] ["/"] payload.fileName;
+          in lib.nameValuePair
+            (if packageVariant.type == "Vsix" then "payload.vsix" else fileName)
+            (pkgs.fetchurl {
+              name = lib.strings.sanitizeDerivationName (baseNameOf fileName);
+              inherit (payload) url sha256;
+              meta = {
+                # presuming everything from MS to be unfree
+                license = lib.licenses.unfree;
+              };
+            });
+          depPred = depDesc:
+            builtins.typeOf depDesc != "set" ||
+            (!(depDesc ? type) ||
+              (includeRecommended && depDesc.type == "Recommended") ||
+              (includeOptional && depDesc.type == "Optional")) &&
+            (!(depDesc ? when) || lib.any (p: p == product) depDesc.when);
+          depManifest = depKey: depDesc: let
+            depPackageId = normalizeVsPackageId (depDesc.id or depKey);
+          in packageManifests."${depPackageId}" {
+            arch = depDesc.chip or arch;
+            inherit language;
+            includeRecommended = false;
+            includeOptional = false;
+          };
+        in rec {
+          id = "${packageVariant.id},version=${packageVariant.version}" +
+            (if packageVariant.chip or null != null then ",chip=${packageVariant.chip}" else "") +
+            (if packageVariant.language or null != null then ",language=${packageVariant.language}" else "") +
+            (if packageVariant.branch or null != null then ",branch=${packageVariant.branch}" else "") +
+            (if packageVariant.productArch or null != null then ",productarch=${packageVariant.productArch}" else "") +
+            (if packageVariant.machineArch or null != null then ",machinearch=${packageVariant.machineArch}" else "");
+          # map of payloads, fileName -> fetchurl derivation
+          payloads = lib.pipe (packageVariant.payloads or []) [
+            (map payloadManifest)
+            lib.listToAttrs
+          ];
+          # list of dependencies (package manifests)
+          dependencies = lib.pipe (packageVariant.dependencies or {}) [
+            (lib.filterAttrs (_dep: depPred))
+            (lib.mapAttrsToList depManifest)
+          ];
+          layoutScript = let
+            dir = id;
+            directories = lib.pipe payloads [
+              (lib.mapAttrsToList (fileName: _payload:
+                dirOf "${dir}/${fileName}"
+              ))
+              lib.unique
+              (lib.sort (a: b: a < b))
+            ];
+          in ''
+            ${lib.optionalString (lib.length directories > 0) "mkdir -p ${lib.escapeShellArgs directories}"}
+            ${lib.concatStrings (lib.mapAttrsToList (fileName: payload: ''
+              ln -s ${payload} ${lib.escapeShellArg "${dir}/${fileName}"}
+            '') payloads)}
+          '';
         };
       in rec {
-        id = "${packageVariant.id},version=${packageVariant.version}" +
-          (if packageVariant.chip or null != null then ",chip=${packageVariant.chip}" else "") +
-          (if packageVariant.language or null != null then ",language=${packageVariant.language}" else "") +
-          (if packageVariant.branch or null != null then ",branch=${packageVariant.branch}" else "") +
-          (if packageVariant.productArch or null != null then ",productarch=${packageVariant.productArch}" else "") +
-          (if packageVariant.machineArch or null != null then ",machinearch=${packageVariant.machineArch}" else "");
-        # map of payloads, fileName -> fetchurl derivation
-        payloads = lib.pipe (packageVariant.payloads or []) [
-          (map payloadManifest)
-          lib.listToAttrs
-        ];
-        # list of dependencies (package manifests)
-        dependencies = lib.pipe (packageVariant.dependencies or {}) [
-          (lib.filterAttrs (_dep: depPred))
-          (lib.mapAttrsToList depManifest)
-        ];
-        layoutScript = let
-          dir = id;
-          directories = lib.pipe payloads [
-            (lib.mapAttrsToList (fileName: _payload:
-              dirOf "${dir}/${fileName}"
-            ))
-            lib.unique
-            (lib.sort (a: b: a < b))
-          ];
-        in ''
-          ${lib.optionalString (lib.length directories > 0) "mkdir -p ${lib.escapeShellArgs directories}"}
-          ${lib.concatStrings (lib.mapAttrsToList (fileName: payload: ''
-            ln -s ${payload} ${lib.escapeShellArg "${dir}/${fileName}"}
-          '') payloads)}
-        '';
+        id = "${packageId}-${arch}-${language}";
+        variants = map packageVariantManifest packageVariants;
       };
-    in rec {
-      id = "${packageId}-${arch}-${language}";
-      variants = map packageVariantManifest packageVariants;
-    };
 
-    packageManifests = lib.mapAttrs packageManifest packages;
+      packageManifests = lib.mapAttrs packageManifest packages;
 
-    # resolve dependencies and return manifest for set of packages
-    resolve = { packageIds, arch, language, includeRecommended ? false, includeOptional ? false }: let
       dfsPackage = package: state: lib.foldr dfsPackageVariant state package.variants;
       dfsPackageVariant = packageVariant: { visited, ... } @ state: if visited."${packageVariant.id}" or false
         then state
@@ -147,7 +147,7 @@ in rec {
         add = map (packageId: "${packageId}${lib.optionalString includeRecommended ";includeRecommended"}${lib.optionalString includeOptional ";includeOptional"}") packageIds;
         addProductLang = [language];
       });
-    in {
+    in rec {
       layoutScript = ''
         ${lib.concatStringsSep "" (map (packageVariant: packageVariant.layoutScript) packageVariants)}
         ln -s ${channelManifest} ChannelManifest.json
@@ -157,6 +157,34 @@ in rec {
         ln -s ${vsSetupExe} vs_setup.exe
         ln -s ${vsInstallerExe} vs_installer.opc
       '';
+
+      disk = windows.runPackerStep {
+        name = "msvs-${toString versionMajor}-${product}";
+        disk = windows.initialDisk {};
+        extraMount = "work";
+        extraMountOut = false;
+        beforeScript = ''
+          mkdir -p work/vslayout
+          cd work/vslayout
+          ${layoutScript}
+          cd ../..
+        '';
+        provisioners = [
+          {
+            type = "powershell";
+            inline = [
+              "D:\\vslayout\\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart"
+            ];
+            valid_exit_codes = [
+              0
+              3010 # success but reboot required
+            ];
+          }
+        ];
+        meta = {
+          license = lib.licenses.unfree;
+        };
+      };
     };
 
     vsSetupExeDesc = lib.head (lib.findSingle (c: c.type == "Bootstrapper") null null channelManifestJSON.channelItems).payloads;
@@ -171,37 +199,6 @@ in rec {
         license = lib.licenses.unfree;
       };
     };
-
-    disk = { packageIds, arch ? "x64", language ? "en-US", includeRecommended ? false, includeOptional ? false }: windows.runPackerStep {
-      name = "msvs-${toString versionMajor}-${product}";
-      disk = windows.initialDisk {};
-      extraMount = "work";
-      extraMountOut = false;
-      beforeScript = ''
-        mkdir -p work/vslayout
-        cd work/vslayout
-        ${(resolve {
-          inherit packageIds arch language includeRecommended includeOptional;
-        }).layoutScript}
-        cd ../..
-      '';
-      provisioners = [
-        {
-          type = "powershell";
-          inline = [
-            "D:\\vslayout\\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart"
-          ];
-          valid_exit_codes = [
-            0
-            3010 # success but reboot required
-          ];
-        }
-      ];
-      meta = {
-        license = lib.licenses.unfree;
-      };
-    };
-
   };
 
   normalizeVsPackageId = lib.toLower;
@@ -216,13 +213,13 @@ in rec {
     universal = "Microsoft.VisualStudio.Workload.Universal";
   };
 
-  vsDisk = { versionMajor, versionPreview ? false, product, workloads }: (vsPackages {
+  vsDisk = { versionMajor, versionPreview ? false, product, workloads }: ((vsPackages {
     inherit versionMajor versionPreview;
-    product = vsProducts."${product}";
-  }).disk {
-    packageIds = map (workload: vsWorkloads."${workload}") workloads;
+  }).resolve {
+    product = vsProducts."${product}" or product;
+    packageIds = map (workload: vsWorkloads."${workload}" or workload) workloads;
     includeRecommended = true;
-  };
+  }).disk;
 
   trackedVersions = [
     { versionMajor = 17; versionPreview = true; }
