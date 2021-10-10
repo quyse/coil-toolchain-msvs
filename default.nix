@@ -199,6 +199,16 @@ in rec {
         license = lib.licenses.unfree;
       };
     };
+
+    products = lib.pipe manifestJSON.packages [
+      (lib.filter (pkg: pkg.type == "Product"))
+      (map (pkg: pkg.id))
+    ];
+
+    workloads = lib.pipe manifestJSON.packages [
+      (lib.filter (pkg: pkg.type == "Workload"))
+      (map (pkg: pkg.id))
+    ];
   };
 
   normalizeVsPackageId = lib.toLower;
