@@ -203,21 +203,10 @@ in rec {
 
   normalizeVsPackageId = lib.toLower;
 
-  vsProducts = {
-    buildTools = "Microsoft.VisualStudio.Product.BuildTools";
-    community = "Microsoft.VisualStudio.Product.Community";
-  };
-  vsWorkloads = {
-    vcTools = "Microsoft.VisualStudio.Workload.VCTools";
-    nativeDesktop = "Microsoft.VisualStudio.Workload.NativeDesktop";
-    universal = "Microsoft.VisualStudio.Workload.Universal";
-  };
-
-  vsDisk = { versionMajor, versionPreview ? false, product, workloads }: ((vsPackages {
+  vsDisk = { versionMajor, versionPreview ? false, product, packageIds }: ((vsPackages {
     inherit versionMajor versionPreview;
   }).resolve {
-    product = vsProducts."${product}" or product;
-    packageIds = map (workload: vsWorkloads."${workload}" or workload) workloads;
+    inherit product packageIds;
     includeRecommended = true;
   }).disk;
 
@@ -228,16 +217,23 @@ in rec {
   ];
 
   trackedProducts = [
-    { product = "buildTools"; workloads = ["vcTools"]; }
-    { product = "community"; workloads = ["nativeDesktop"]; }
+    {
+      product = "Microsoft.VisualStudio.Product.BuildTools";
+      packageIds = ["Microsoft.VisualStudio.Workload.VCTools"];
+    }
+    {
+      product = "Microsoft.VisualStudio.Product.Community";
+      packageIds = ["Microsoft.VisualStudio.Workload.NativeDesktop"];
+    }
   ];
 
   trackedVariants = lib.concatMap (version: map (product: version // product) trackedProducts) trackedVersions;
 
   trackedDisks = lib.pipe trackedVariants [
-    (map (variant: lib.nameValuePair
-      "vs${toString variant.versionMajor}${variant.product}Disk"
-      (vsDisk variant)
+    (map (variant: lib.nameValuePair "vs${toString variant.versionMajor}_${lib.removePrefix "Microsoft.VisualStudio.Product." variant.product}${lib.pipe variant.packageIds [
+      (map (packageId: "_${lib.removePrefix "Microsoft.VisualStudio.Workload." packageId}"))
+      lib.concatStrings
+    ]}Disk" (vsDisk variant)
     ))
     lib.listToAttrs
   ];
