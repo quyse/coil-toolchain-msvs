@@ -148,6 +148,12 @@ in rec {
         addProductLang = [language];
       });
     in rec {
+      name = "msvs_${shortenProduct product}${lib.pipe packageIds [
+        (map (packageId: "_${shortenWorkload packageId}"))
+        lib.concatStrings
+      ]}";
+      version = channelManifestJSON.info.productSemanticVersion;
+
       layoutScript = ''
         ${lib.concatStringsSep "" (map (packageVariant: packageVariant.layoutScript) packageVariants)}
         ln -s ${channelManifest} ChannelManifest.json
@@ -159,7 +165,7 @@ in rec {
       '';
 
       disk = windows.runPackerStep {
-        name = "msvs-${toString versionMajor}-${product}";
+        name = "${name}_disk-${version}";
         disk = windows.initialDisk {};
         extraMount = "work";
         extraMountOut = false;
@@ -213,12 +219,8 @@ in rec {
 
   normalizeVsPackageId = lib.toLower;
 
-  vsDisk = { versionMajor, versionPreview ? false, product, packageIds }: ((vsPackages {
-    inherit versionMajor versionPreview;
-  }).resolve {
-    inherit product packageIds;
-    includeRecommended = true;
-  }).disk;
+  shortenProduct = lib.removePrefix "Microsoft.VisualStudio.Product.";
+  shortenWorkload = lib.removePrefix "Microsoft.VisualStudio.Workload.";
 
   trackedVersions = [
     { versionMajor = 17; versionPreview = true; }
@@ -240,11 +242,14 @@ in rec {
   trackedVariants = lib.concatMap (version: map (product: version // product) trackedProducts) trackedVersions;
 
   trackedDisks = lib.pipe trackedVariants [
-    (map (variant: lib.nameValuePair "vs${toString variant.versionMajor}_${lib.removePrefix "Microsoft.VisualStudio.Product." variant.product}${lib.pipe variant.packageIds [
-      (map (packageId: "_${lib.removePrefix "Microsoft.VisualStudio.Workload." packageId}"))
-      lib.concatStrings
-    ]}Disk" (vsDisk variant)
-    ))
+    (map (variant: let
+      resolved = (vsPackages {
+        inherit (variant) versionMajor versionPreview;
+      }).resolve {
+        inherit (variant) product packageIds;
+        includeRecommended = true;
+      };
+    in lib.nameValuePair resolved.name resolved.disk))
     lib.listToAttrs
   ];
 
