@@ -99,9 +99,7 @@ in rec {
           layoutScript = let
             dir = id;
             directories = lib.pipe payloads [
-              (lib.mapAttrsToList (fileName: _payload:
-                dirOf "${dir}/${fileName}"
-              ))
+              (lib.mapAttrsToList (fileName: _payload: dirOf "${dir}/${fileName}"))
               lib.unique
               (lib.sort (a: b: a < b))
             ];
@@ -155,7 +153,7 @@ in rec {
       version = channelManifestJSON.info.productSemanticVersion;
 
       layoutScript = ''
-        ${lib.concatStringsSep "" (map (packageVariant: packageVariant.layoutScript) packageVariants)}
+        ${lib.concatStrings (map (packageVariant: packageVariant.layoutScript) packageVariants)}
         ln -s ${channelManifest} ChannelManifest.json
         ln -s ${manifest} Catalog.json
         ln -s ${layoutJson} Layout.json
@@ -256,7 +254,7 @@ in rec {
   updateFixedsManifests = let
     changes = lib.pipe trackedVersions [
       (map (version: let
-        packages = vsPackages (version // { product = null; });
+        packages = vsPackages version;
       in lib.nameValuePair (toString version.versionMajor) {
         url = packages.manifestDesc.url;
         comment = packages.channelManifestJSON.info.productDisplayVersion;
