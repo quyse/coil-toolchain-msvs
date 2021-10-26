@@ -3,6 +3,8 @@
 , lib ? pkgs.lib
 , fixedsFile ? ./fixeds.json
 , fixeds ? lib.importJSON fixedsFile
+, versionsInfoFile ? ./versions.json
+, versionsInfo ? lib.importJSON versionsInfoFile
 }: let
 
   windows = toolchain.windows {
@@ -12,13 +14,21 @@
 in rec {
   # Nix-based package downloader for Visual Studio
   # inspiration: https://github.com/mstorsjo/msvc-wine/blob/master/vsdownload.py
-  vsPackages = { versionMajor, versionPreview ? false }: rec {
+  vsPackages = { version, versionPreview ? false }: rec {
 
-    uriPrefix = "https://aka.ms/vs/${toString versionMajor}/${if versionPreview then "pre" else "release"}";
+    versionParts = lib.splitString "." version;
+    versionMajor = lib.head versionParts;
+    versionIsMajor = lib.length versionParts <= 1;
 
-    channelUri = "${uriPrefix}/channel";
+    uriPrefix = "https://aka.ms/vs/${versionMajor}/${if versionPreview then "pre" else "release"}";
+
+    channelUrl = if versionIsMajor
+      then "${uriPrefix}/channel"
+      else versionsInfo.channels."${version}"
+    ;
+    actualChannelUrl = fixeds.fetchurl."${channelUrl}".url;
     channelManifest = pkgs.fetchurl {
-      inherit (fixeds.fetchurl."${channelUri}") url sha256 name;
+      inherit (fixeds.fetchurl."${channelUrl}") url sha256 name;
     };
     channelManifestJSON = lib.importJSON channelManifest;
 
@@ -137,7 +147,7 @@ in rec {
         inherit arch language includeRecommended includeOptional;
       }) (packageIds ++ [product]))).packageVariants;
       layoutJson = pkgs.writeText "layout.json" (builtins.toJSON {
-        inherit channelUri;
+        channelUri = actualChannelUrl;
         channelId = channelManifestJSON.info.manifestName;
         productId = product;
         installChannelUri = ".\\ChannelManifest.json";
@@ -221,9 +231,9 @@ in rec {
   shortenWorkload = lib.removePrefix "Microsoft.VisualStudio.Workload.";
 
   trackedVersions = [
-    { versionMajor = 17; versionPreview = true; }
-    { versionMajor = 16; }
-    { versionMajor = 15; }
+    { versionMajor = "17"; versionPreview = true; }
+    { versionMajor = "16"; }
+    { versionMajor = "15"; }
   ];
 
   trackedProducts = [
@@ -242,7 +252,8 @@ in rec {
   trackedDisks = lib.pipe trackedVariants [
     (map (variant: let
       resolved = (vsPackages {
-        inherit (variant) versionMajor versionPreview;
+        version = variant.versionMajor;
+        inherit (variant) versionPreview;
       }).resolve {
         inherit (variant) product packageIds;
         includeRecommended = true;
@@ -251,59 +262,95 @@ in rec {
     lib.listToAttrs
   ];
 
+  allManifests = lib.pipe versionsInfo.channels [
+    (lib.mapAttrsToList (version: _channelUrl: let
+      packages = vsPackages {
+        inherit version;
+      };
+    in ''
+      ${packages.channelManifest}
+      ${packages.manifest}
+    ''))
+    lib.concatStrings
+    (pkgs.writeText "msvs_manifests.txt")
+  ];
+
   updateFixedsManifests = let
-    changes = lib.pipe trackedVersions [
+    latestMajorVersions = lib.pipe trackedVersions [
       (map (version: let
-        packages = vsPackages version;
-      in lib.nameValuePair (toString version.versionMajor) {
-        url = packages.manifestDesc.url;
-        comment = packages.channelManifestJSON.info.productDisplayVersion;
+        packages = vsPackages {
+          version = version.versionMajor;
+          versionPreview = version.versionPreview or false;
+        };
+      in lib.nameValuePair version.versionMajor {
+        versionPreview = version.versionPreview or false;
+        channelUrl = packages.actualChannelUrl;
+        manifestUrl = packages.manifestDesc.url;
+        version = packages.channelManifestJSON.info.productDisplayVersion;
       }))
       lib.listToAttrs
     ];
-    changeForObj = obj: let
-      commentParts = lib.splitString "." (obj.comment or "");
-    in changes."${lib.head commentParts}" or null;
-    newFixeds = fixeds // {
-      fetchurl = lib.mapAttrs' (url: obj: let
+    changedMajorVersions = lib.foldl (latestVersions: obj: let
+      objVersion = obj.comment or "";
+      objVersionMajor = lib.head (lib.splitString "." objVersion);
+      latestVersion = latestVersions."${objVersionMajor}" or {};
+    in if latestVersion.version or null == objVersion
+      then removeAttrs latestVersions [objVersionMajor]
+      else latestVersions
+    ) latestMajorVersions (lib.attrValues fixeds.fetchurl);
+    changeForObj = obj: changedMajorVersions."${lib.head (lib.splitString "." (obj.comment or ""))}" or null;
+    newFixeds = let
+      keptFetchurls = lib.filterAttrs (url: obj: let
         change = changeForObj obj;
-      in if change != null then lib.nameValuePair change.url (obj // {
-        inherit (change) comment;
-      }) else lib.nameValuePair url obj) fixeds.fetchurl;
+      in change == null || !(change.versionPreview or false)) fixeds.fetchurl;
+      newFetchurlsChannels = lib.mapAttrs' (_versionMajor: { version, channelUrl, ... }: lib.nameValuePair channelUrl (fixeds.fetchurl."${channelUrl}" or {} // {
+        comment = version;
+      })) changedMajorVersions;
+      newFetchurlsManifests = lib.mapAttrs' (_versionMajor: { version, manifestUrl, ... }: lib.nameValuePair manifestUrl (fixeds.fetchurl."${manifestUrl}" or {} // {
+        comment = version;
+      })) changedMajorVersions;
+    in fixeds // {
+      fetchurl = keptFetchurls // newFetchurlsChannels // newFetchurlsManifests;
     };
     newFixedsFile = pkgs.writeText "fixeds.json" (builtins.toJSON newFixeds);
-    totalComment = lib.pipe fixeds.fetchurl [
+    newVersionsInfo = versionsInfo // {
+      channels = lib.pipe changedMajorVersions [
+        (lib.filterAttrs (_versionMajor: { versionPreview, ... }: !versionPreview))
+        (lib.mapAttrs' (_versionMajor: { version, channelUrl, ... }: lib.nameValuePair version channelUrl))
+        (changes: versionsInfo.channels // changes)
+      ];
+    };
+    newVersionsInfoFile = pkgs.runCommand "versions.json" {} ''
+      ${pkgs.jq}/bin/jq -S < ${pkgs.writeText "versions.json" (builtins.toJSON newVersionsInfo)} > $out
+    '';
+    totalComment = lib.pipe changedMajorVersions [
       lib.attrValues
-      (map (obj: let
-        change = changeForObj obj;
-      in if change != null && change.comment != obj.comment
-        then "msvs ${change.comment}"
-        else null
-      ))
-      (lib.filter (comment: comment != null))
+      (map ({ version, ... }: version))
       (lib.sort lib.versionOlder)
+      (map (version: "msvs ${version}"))
       (lib.concatStringsSep ", ")
     ];
   in pkgs.runCommand "updateFixedsManifests" {} ''
     mkdir $out
     cp ${newFixedsFile} $out/fixeds.json
+    cp ${newVersionsInfoFile} $out/versions.json
     echo ${lib.escapeShellArg (if totalComment == "" then "update fixeds" else totalComment)} > $out/.git-commit
   '';
 
   autoUpdateScript = pkgs.writeShellScript "toolchain_msvs_auto_update" ''
-    set -e
+    set -eu
     shopt -s dotglob
     cp --no-preserve=mode ${fixedsFile} ./fixeds.json
     ${toolchain.refreshFixedsScript}
     if ! cmp -s ${fixedsFile} ./fixeds.json
     then
-      NEW_FIXEDS=$(nix-build -QA updateFixedsManifests ${./default.nix} --arg toolchain null --arg fixedsFile ./fixeds.json --no-out-link)
+      NEW_FIXEDS=$(nix-build --show-trace -QA updateFixedsManifests ${./default.nix} --arg toolchain null --arg fixedsFile ./fixeds.json --arg versionsInfoFile ${versionsInfoFile} --no-out-link)
       cp --no-preserve=mode ''${NEW_FIXEDS:?failed to get new fixeds}/* ./
       ${toolchain.refreshFixedsScript}
     fi
   '';
 
   touch = trackedDisks // {
-    inherit autoUpdateScript;
+    inherit autoUpdateScript allManifests;
   };
 }
