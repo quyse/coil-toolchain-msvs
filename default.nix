@@ -61,7 +61,6 @@ in rec {
           ) &&
           (!(packageVariant ? language) || packageVariant.language == "neutral" || packageVariant.language == language);
         packageVariants = lib.filter packageVariantPred package;
-        name = "${packageId}-${arch}-${language}${if includeRecommended then "-rec" else ""}${if includeOptional then "-opt" else ""}";
         packageVariantManifest = packageVariant: let
           payloadManifest = payload: let
             fileName = lib.replaceStrings ["\\"] ["/"] payload.fileName;
@@ -231,7 +230,7 @@ in rec {
   shortenWorkload = lib.removePrefix "Microsoft.VisualStudio.Workload.";
 
   trackedVersions = [
-    { versionMajor = "17"; versionPreview = true; }
+    { versionMajor = "17"; }
     { versionMajor = "16"; }
     { versionMajor = "15"; }
   ];
@@ -253,7 +252,7 @@ in rec {
     (map (variant: let
       resolved = (vsPackages {
         version = variant.versionMajor;
-        inherit (variant) versionPreview;
+        versionPreview = variant.versionPreview or false;
       }).resolve {
         inherit (variant) product packageIds;
         includeRecommended = true;
