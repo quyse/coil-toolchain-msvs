@@ -108,7 +108,8 @@ in rec {
           layoutScript = let
             dir = id;
             directories = lib.pipe payloads [
-              (lib.mapAttrsToList (fileName: _payload: dirOf "${dir}/${fileName}"))
+              lib.attrNames
+              (map (fileName: dirOf "${dir}/${fileName}"))
               lib.unique
               (lib.sort (a: b: a < b))
             ];
@@ -186,7 +187,7 @@ in rec {
           {
             type = "powershell";
             inline = [
-              "D:\\vslayout\\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart"
+              ''D:\vslayout\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart''
             ];
             valid_exit_codes = [
               0
