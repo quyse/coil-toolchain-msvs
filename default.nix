@@ -1,17 +1,14 @@
 { pkgs ? import <nixpkgs> {}
 , toolchain
+, toolchain-windows
 , lib ? pkgs.lib
 , fixedsFile ? ./fixeds.json
 , fixeds ? lib.importJSON fixedsFile
 , versionsInfoFile ? ./versions.json
 , versionsInfo ? lib.importJSON versionsInfoFile
-}: let
+}:
 
-  windows = toolchain.windows {
-    inherit pkgs;
-  };
-
-in rec {
+rec {
   # Nix-based package downloader for Visual Studio
   # inspiration: https://github.com/mstorsjo/msvc-wine/blob/master/vsdownload.py
   vsPackages = { version, versionPreview ? false }: rec {
@@ -169,9 +166,9 @@ in rec {
         ln -s ${vsInstallerExe} vs_installer.opc
       '';
 
-      disk = windows.runPackerStep {
+      disk = toolchain-windows.runPackerStep {
         name = "${name}_disk-${version}";
-        disk = windows.initialDisk {};
+        disk = toolchain-windows.initialDisk {};
         extraMount = "work";
         extraMountOut = false;
         beforeScript = ''
