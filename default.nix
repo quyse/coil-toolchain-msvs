@@ -156,10 +156,7 @@ in rec {
         addProductLang = [language];
       });
     in rec {
-      name = "msvs_${shortenProduct product}${lib.pipe packageIds [
-        (map (packageId: "_${shortenWorkload packageId}"))
-        lib.concatStrings
-      ]}";
+      name = "msvs_${shortenProduct product}_${shortenWorkload (lib.head packageIds)}";
       version = channelManifestJSON.info.productSemanticVersion;
 
       layoutScript = ''
