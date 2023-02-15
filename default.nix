@@ -338,7 +338,7 @@ rec {
     ${toolchain.refreshFixedsScript}
     if ! cmp -s ${fixedsFile} ./fixeds.json
     then
-      NEW_FIXEDS=$(nix-build --show-trace -QA updateFixedsManifests ${./default.nix} --arg toolchain null --arg fixedsFile ./fixeds.json --arg versionsInfoFile ${versionsInfoFile} --no-out-link)
+      NEW_FIXEDS=$(nix-build --show-trace -QA updateFixedsManifests ${./default.nix} --arg toolchain null --arg toolchain-windows null --arg fixedsFile ./fixeds.json --arg versionsInfoFile ${versionsInfoFile} --no-out-link)
       cp --no-preserve=mode ''${NEW_FIXEDS:?failed to get new fixeds}/* ./
       ${toolchain.refreshFixedsScript}
     fi
