@@ -29,18 +29,18 @@
       "url": "https://download.visualstudio.microsoft.com/download/pr/50e007f5-f272-4bc3-a6b8-717859dae1ee/5CF630399686ECFAA629F62C3DCCA3EA83AA7230D2D1672D9D1D0F204B463E32/vs_installer.opc"
     },
     "https://aka.ms/vs/17/release/channel": {
-      "etag": "\"0x281DA79F79F0002072CB6DF26225AD890778D91217527A2A71FBE87C81A9E224\"",
-      "last-modified": "Sat, 04 Feb 2023 01:34:31 GMT",
+      "etag": "\"0x38C6E8D78293860E9B4D62414A1E36FC893AE1926061FE0793F8FB1DB3AF857D\"",
+      "last-modified": "Wed, 15 Feb 2023 07:52:26 GMT",
       "name": "VisualStudio.17.Release.chman",
-      "sha256": "0ndlbil1pqyxy8pjfc7i549kqly23x04mki8fyzdx262bfnbjmm4",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/23ed7a01-a363-4dd3-8efb-5bf5b2cd89fd/630c14749789994eb6e11270147083ebc178f4ca74fd0d4f3763443d41a6091e/VisualStudio.17.Release.chman"
+      "sha256": "0vbnslm2ir93qxmbiz9p6gnd7ws28kgv1v8l571dr10gv0w0jx7h",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/7441b53e-6bdf-4438-994f-b0c1874af85c/9a201ad63563cbb7cd37b78403f9ada72ddb295bc70a140e345faf845d3f1d20/VisualStudio.17.Release.chman"
     },
     "https://aka.ms/vs/17/release/installer": {
-      "etag": "\"0xF155435295884E622D4898A7BA7375C0EB46533571428E1991CE74F612AD9D0D\"",
-      "last-modified": "Sat, 04 Feb 2023 01:17:19 GMT",
+      "etag": "\"0x6D28141822FFC5C3798201705D88219E62888DFA288C4275E42F7C7D3D1EE6CE\"",
+      "last-modified": "Wed, 15 Feb 2023 07:36:44 GMT",
       "name": "vs_installer.opc",
-      "sha256": "16dr1damkksjdljv3hrby6g2agwbwi96jzz3dqq42b5562q25z1k",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/23ed7a01-a363-4dd3-8efb-5bf5b2cd89fd/33FC22B030A52C41306EE37F6952E48B3F259EF12BC3B1256D52CF59550BB999/vs_installer.opc"
+      "sha256": "18gdh3jd2p3g6ap9b8rijdhfqca243mi4ic11287rsqqw4z26nwf",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/7441b53e-6bdf-4438-994f-b0c1874af85c/8E5B233EE118EB7C9008814512EB204231EC609331A395AE326F5CD1E480EDA1/vs_installer.opc"
     },
     "https://download.visualstudio.microsoft.com/download/pr/010d871e-3fa8-4004-b219-1c10bcaa71ad/007e743d98343f0746d89c1e1466a533b5ce02dc8f2879b74bf9f5351fac14ea/VisualStudio.vsman": {
       "comment": "15.9.31",
@@ -745,6 +745,22 @@
       "name": "VisualStudio.16.Release.chman",
       "sha256": "1xwyqpxydixq101aa5nb00sv1vnldmmwmfh0yxvlv0jgar27jlgb",
       "url": "https://download.visualstudio.microsoft.com/download/pr/73f91fcb-aa18-4bec-8c2f-8270acb22398/8628d69a9ba859cbef7da391411f59631a2142c1ad8297cd0543e29facfbd79f/VisualStudio.16.Release.chman"
+    },
+    "https://download.visualstudio.microsoft.com/download/pr/7441b53e-6bdf-4438-994f-b0c1874af85c/9a201ad63563cbb7cd37b78403f9ada72ddb295bc70a140e345faf845d3f1d20/VisualStudio.17.Release.chman": {
+      "comment": "17.5.0",
+      "etag": "\"0x38C6E8D78293860E9B4D62414A1E36FC893AE1926061FE0793F8FB1DB3AF857D\"",
+      "last-modified": "Wed, 15 Feb 2023 07:52:26 GMT",
+      "name": "VisualStudio.17.Release.chman",
+      "sha256": "0vbnslm2ir93qxmbiz9p6gnd7ws28kgv1v8l571dr10gv0w0jx7h",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/7441b53e-6bdf-4438-994f-b0c1874af85c/9a201ad63563cbb7cd37b78403f9ada72ddb295bc70a140e345faf845d3f1d20/VisualStudio.17.Release.chman"
+    },
+    "https://download.visualstudio.microsoft.com/download/pr/7441b53e-6bdf-4438-994f-b0c1874af85c/c2800b63206875602975a60a86bee80c29ff8487484a49230d63e04b116d9ac2/VisualStudio.vsman": {
+      "comment": "17.5.0",
+      "etag": "\"0x7186697B9FFD1D4BD3EF3D1DCFC540159032F6593B6D86B8AE2D76A20B6AAEB3\"",
+      "last-modified": "Wed, 15 Feb 2023 07:52:26 GMT",
+      "name": "VisualStudio.vsman",
+      "sha256": "0y3r0lxbm6p6v8sdy2098pmxy41nbpl6kz7bhnc6c6043q31s0pp",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/7441b53e-6bdf-4438-994f-b0c1874af85c/c2800b63206875602975a60a86bee80c29ff8487484a49230d63e04b116d9ac2/VisualStudio.vsman"
     },
     "https://download.visualstudio.microsoft.com/download/pr/791f3d28-7e20-45d9-9373-5dcfbdd1f6db/3f9031c058fabe9310f50ed3227825a162d05d4d99c6b81bb19f8df1a0952fda/VisualStudio.vsman": {
       "comment": "16.11.10",
