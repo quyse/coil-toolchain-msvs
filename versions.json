@@ -56,6 +56,7 @@
     "16.11.3": "https://download.visualstudio.microsoft.com/download/pr/22c17f05-944c-48dc-9f68-b1663f9df4cb/f6ab79867bff573219e8e3879659a50ab54735fd7063aa6f3d815f01f07e4b53/VisualStudio.16.Release.chman",
     "16.11.30": "https://download.visualstudio.microsoft.com/download/pr/9632a9a9-9059-400b-aaeb-efca72aeadd1/9d36ea516c3716ee4883c58c535fce38579c1388140a3cf129ad85edae9bdbc7/VisualStudio.16.Release.chman",
     "16.11.31": "https://download.visualstudio.microsoft.com/download/pr/1f10f231-caa4-4ec6-ae24-bd414213cf89/4599fba470e98070308f5662dffdbef9b0081390cac1f60fccba0443bfc5f5aa/VisualStudio.16.Release.chman",
+    "16.11.32": "https://download.visualstudio.microsoft.com/download/pr/ed573b12-f211-4911-834c-c3e3a87d7e58/340d19ec9bd2802c79080bf7f8fef095f29af5e3ef1cca9dee80521501ca82e9/VisualStudio.16.Release.chman",
     "16.11.4": "https://download.visualstudio.microsoft.com/download/pr/1051e775-b2c9-4b7a-a227-1e60bffe102a/601f8d08596bb8a2b522d3b5f972fb30654bf925e4aa667b03aeaa3689e40ea2/VisualStudio.16.Release.chman",
     "16.11.5": "https://download.visualstudio.microsoft.com/download/pr/5a50b8ac-2c22-47f1-ba60-70d4257a78fa/4bfa2cee00a4ab39d204e1a0fd4a3782874f1cdf74eba5b3d6ddc0d68ff27fde/VisualStudio.16.Release.chman",
     "16.11.6": "https://download.visualstudio.microsoft.com/download/pr/f1e43525-cd53-4012-9644-d7846e2c4963/d3204d925ca1885d6f9cf582a03889f8c2f045c875a9e9d854aa1dbe2bfd6a34/VisualStudio.16.Release.chman",
@@ -123,6 +124,7 @@
     "17.7.3": "https://download.visualstudio.microsoft.com/download/pr/1d66edfe-3c83-476b-bf05-e8901c62ba7f/10362e7b393423eb9208b6223aa2e01c5a4994646f78a2ff1fa0678571254db0/VisualStudio.17.Release.chman",
     "17.7.4": "https://download.visualstudio.microsoft.com/download/pr/e514a25b-a89d-4051-a63c-05ccd9be41e9/cf27254fb6e2508fdae3071a145d401af6d7ae183d98d43abc93888ee2099021/VisualStudio.17.Release.chman",
     "17.7.5": "https://download.visualstudio.microsoft.com/download/pr/8bee1b10-0767-416b-a3c0-d658a719947b/fdd8b045671c6f82aec4d8ac295d71fc66237a365a4cb2946b3b045c2d7585cd/VisualStudio.17.Release.chman",
-    "17.7.6": "https://download.visualstudio.microsoft.com/download/pr/ebbb3a8f-0b8f-4c9d-ac08-5e244e84b4fe/99cc788e2b3c978af5c17d4a2093d858934be89c03e426b965382ebb1bc64f03/VisualStudio.17.Release.chman"
+    "17.7.6": "https://download.visualstudio.microsoft.com/download/pr/ebbb3a8f-0b8f-4c9d-ac08-5e244e84b4fe/99cc788e2b3c978af5c17d4a2093d858934be89c03e426b965382ebb1bc64f03/VisualStudio.17.Release.chman",
+    "17.8.0": "https://download.visualstudio.microsoft.com/download/pr/eb105084-8c42-4491-a292-51b4ab48d847/28e566a4f0456199773b78a2c5ea56b336a86b4b64d086f93d49c58c1bfe285e/VisualStudio.17.Release.chman"
   }
 }
