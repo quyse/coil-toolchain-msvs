@@ -4,6 +4,10 @@ Nix-based support for building with MSVS on Linux.
 
 This repo allows to build QEMU VM image with installed MSVS as a sandbox-compatible Nix derivation, in fully automatic fashion.
 
+## Usage
+
+This repository is not meant to be used directly. Please see Coil Toolchain for Windows project for a usage example.
+
 ## Implementation
 
 The script runs in two stages.
