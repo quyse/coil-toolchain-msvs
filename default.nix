@@ -181,7 +181,7 @@ rec {
           {
             type = "powershell";
             inline = [
-              ''D:\vslayout\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart''
+              ''D:\work\vslayout\vs_setup.exe --quiet --wait --noWeb --noUpdateInstaller --norestart''
             ];
             valid_exit_codes = [
               0
