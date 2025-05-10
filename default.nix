@@ -1,6 +1,5 @@
 { pkgs ? import <nixpkgs> {}
-, toolchain
-, toolchain-windows
+, coil
 , lib ? pkgs.lib
 , fixedsFile ? ./fixeds.json
 , fixeds ? lib.importJSON fixedsFile
@@ -166,9 +165,9 @@ rec {
         ln -s ${vsInstallerExe} vs_installer.opc
       '';
 
-      disk = toolchain-windows.runPackerStep {
+      disk = coil.toolchain-windows.runPackerStep {
         name = "${name}_disk-${version}";
-        disk = toolchain-windows.initialDisk {};
+        disk = coil.toolchain-windows.initialDisk {};
         extraMount = "work";
         extraMountOut = false;
         beforeScript = ''
@@ -335,12 +334,12 @@ rec {
     set -eu
     shopt -s dotglob
     cp --no-preserve=mode ${fixedsFile} ./fixeds.json
-    ${toolchain.refreshFixedsScript}
+    ${coil.toolchain.refreshFixedsScript}
     if ! cmp -s ${fixedsFile} ./fixeds.json
     then
-      NEW_FIXEDS=$(nix-build --show-trace -QA updateFixedsManifests ${./default.nix} --arg toolchain null --arg toolchain-windows null --arg fixedsFile ./fixeds.json --arg versionsInfoFile ${versionsInfoFile} --no-out-link)
+      NEW_FIXEDS=$(nix-build --show-trace -QA updateFixedsManifests ${./default.nix} --arg coil null --arg fixedsFile ./fixeds.json --arg versionsInfoFile ${versionsInfoFile} --no-out-link)
       cp --no-preserve=mode ''${NEW_FIXEDS:?failed to get new fixeds}/* ./
-      ${toolchain.refreshFixedsScript}
+      ${coil.toolchain.refreshFixedsScript}
     fi
   '';
 
