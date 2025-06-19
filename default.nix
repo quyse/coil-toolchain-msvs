@@ -279,7 +279,7 @@ rec {
         versionPreview = version.versionPreview or false;
         channelUrl = packages.actualChannelUrl;
         manifestUrl = packages.manifestDesc.url;
-        version = packages.channelManifestJSON.info.productDisplayVersion;
+        version = lib.head (lib.split " " packages.channelManifestJSON.info.productDisplayVersion);
       }))
       lib.listToAttrs
     ];
