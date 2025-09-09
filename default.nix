@@ -16,7 +16,7 @@ rec {
     versionMajor = lib.head versionParts;
     versionIsMajor = lib.length versionParts <= 1;
 
-    uriPrefix = "https://aka.ms/vs/${versionMajor}/${if versionPreview then "pre" else "release"}";
+    uriPrefix = "https://aka.ms/vs/${versionMajor}/${if versionPreview then (if lib.versionAtLeast version "18" then "insiders" else "pre") else "release"}";
 
     channelUrl = if versionIsMajor
       then "${uriPrefix}/channel"
@@ -225,6 +225,7 @@ rec {
   shortenWorkload = lib.removePrefix "Microsoft.VisualStudio.Workload.";
 
   trackedVersions = [
+    { versionMajor = "18"; versionPreview = true; }
     { versionMajor = "17"; }
     { versionMajor = "16"; }
     { versionMajor = "15"; }
