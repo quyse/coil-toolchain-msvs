@@ -41,20 +41,20 @@ rec {
     packages = lib.groupBy (package: normalizeVsPackageId package.id) manifestJSON.packages;
 
     # resolve dependencies and return manifest for set of packages
-    resolve = { product, packageIds, arch ? "x64", language ? "en-US", includeRecommended ? false, includeOptional ? false }: let
+    resolve = { product, packageIds, arch ? "x64", arch2 ? "x86", language ? "en-US", includeRecommended ? false, includeOptional ? false }: let
       packageManifest = packageId: package:
-        { arch
-        , language
-        , includeRecommended
-        , includeOptional
+        { chip
+        , productArch
+        , machineArch
         }: let
         packageVariantPred = packageVariant: let
-          chipPred = !(packageVariant ? chip) || packageVariant.chip == "neutral" || packageVariant.chip == arch;
+          packageVariantChip = lib.toLower (packageVariant.chip or "neutral");
+          packageVariantProductArch = lib.toLower (packageVariant.productArch or "neutral");
+          packageVariantMachineArch = lib.toLower (packageVariant.machineArch or "neutral");
         in
-          (if packageVariant ? productArch
-            then lib.toLower packageVariant.productArch == "neutral" || lib.toLower packageVariant.productArch == arch || chipPred
-            else chipPred
-          ) &&
+          (chip == "" || packageVariantChip == "neutral" || packageVariantChip == chip) &&
+          (productArch == "" || packageVariantProductArch == "neutral" || packageVariantProductArch == productArch) &&
+          (machineArch == "" || packageVariantMachineArch == "neutral" || packageVariantMachineArch == machineArch) &&
           (!(packageVariant ? language) || packageVariant.language == "neutral" || packageVariant.language == language);
         packageVariants = lib.filter packageVariantPred package;
         packageVariantManifest = packageVariant: let
@@ -79,10 +79,9 @@ rec {
           depManifest = depKey: depDesc: let
             depPackageId = normalizeVsPackageId (depDesc.id or depKey);
           in packageManifests."${depPackageId}" {
-            arch = depDesc.chip or arch;
-            inherit language;
-            includeRecommended = false;
-            includeOptional = false;
+            chip = lib.toLower (depDesc.chip or "");
+            productArch = lib.toLower (depDesc.productArch or arch2);
+            machineArch = lib.toLower (depDesc.machineArch or "");
           };
         in rec {
           id = "${packageVariant.id},version=${packageVariant.version}" +
@@ -117,7 +116,7 @@ rec {
           '';
         };
       in rec {
-        id = "${packageId}-${arch}-${language}";
+        id = "${packageId}-${chip}-${productArch}-${machineArch}";
         variants = map packageVariantManifest packageVariants;
       };
 
@@ -140,7 +139,9 @@ rec {
         visited = {};
         packageVariants = [];
       } (map (packageId: packageManifests."${normalizeVsPackageId packageId}" {
-        inherit arch language includeRecommended includeOptional;
+        chip = arch;
+        productArch = arch2;
+        machineArch = arch;
       }) (packageIds ++ [product]))).packageVariants;
       layoutJson = pkgs.writeText "layout.json" (builtins.toJSON {
         channelUri = actualChannelUrl;
