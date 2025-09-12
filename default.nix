@@ -288,8 +288,9 @@ rec {
     changedMajorVersions = lib.foldl (latestVersions: obj: let
       objVersion = obj.comment or "";
       objVersionMajor = lib.head (lib.splitString "." objVersion);
+      objUrl = obj.url or "";
       latestVersion = latestVersions."${objVersionMajor}" or {};
-    in if latestVersion.version or null == objVersion
+    in if latestVersion.version or null == objVersion && (latestVersion.channelUrl or null == objUrl || latestVersion.manifestUrl or null == objUrl)
       then removeAttrs latestVersions [objVersionMajor]
       else latestVersions
     ) latestMajorVersions (lib.attrValues fixeds.fetchurl);
