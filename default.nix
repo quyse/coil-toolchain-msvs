@@ -152,6 +152,7 @@ rec {
         add = map (packageId: "${packageId}${lib.optionalString includeRecommended ";includeRecommended"}${lib.optionalString includeOptional ";includeOptional"}") packageIds;
         addProductLang = [language];
       });
+
     in rec {
       name = "msvs_${shortenProduct product}_${shortenWorkload (lib.head packageIds)}";
       version = channelManifestJSON.info.productSemanticVersion;
@@ -236,10 +237,6 @@ rec {
       product = "Microsoft.VisualStudio.Product.BuildTools";
       packageIds = ["Microsoft.VisualStudio.Workload.VCTools"];
     }
-    {
-      product = "Microsoft.VisualStudio.Product.Community";
-      packageIds = ["Microsoft.VisualStudio.Workload.NativeDesktop"];
-    }
   ];
 
   trackedVariants = lib.concatMap (version: map (product: version // product) trackedProducts) trackedVersions;
@@ -253,7 +250,7 @@ rec {
         inherit (variant) product packageIds;
         includeRecommended = true;
       };
-    in lib.nameValuePair resolved.name resolved.disk))
+    in lib.nameValuePair "${resolved.name}-${resolved.version}" resolved.disk))
     lib.listToAttrs
   ];
 
