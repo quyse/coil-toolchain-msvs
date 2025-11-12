@@ -9,14 +9,18 @@
 
 rec {
   # Nix-based package downloader for Visual Studio
-  # inspiration: https://github.com/mstorsjo/msvc-wine/blob/master/vsdownload.py
-  vsPackages = { version, versionPreview ? false }: rec {
+  vsPackages = { version, versionChannel ? {
+    "18" = "stable";
+    "17" = "release";
+    "16" = "release";
+    "15" = "release";
+  }."${version}" }: rec {
 
     versionParts = lib.splitString "." version;
     versionMajor = lib.head versionParts;
     versionIsMajor = lib.length versionParts <= 1;
 
-    uriPrefix = "https://aka.ms/vs/${versionMajor}/${if versionPreview then (if lib.versionAtLeast version "18" then "insiders" else "pre") else "release"}";
+    uriPrefix = "https://aka.ms/vs/${versionMajor}/${versionChannel}";
 
     channelUrl = if versionIsMajor
       then "${uriPrefix}/channel"
@@ -226,10 +230,10 @@ rec {
   shortenWorkload = lib.removePrefix "Microsoft.VisualStudio.Workload.";
 
   trackedVersions = [
-    { versionMajor = "18"; versionPreview = true; }
-    { versionMajor = "17"; }
-    { versionMajor = "16"; }
-    { versionMajor = "15"; }
+    { versionMajor = "18"; versionChannel = "stable"; }
+    { versionMajor = "17"; versionChannel = "release"; }
+    { versionMajor = "16"; versionChannel = "release"; }
+    { versionMajor = "15"; versionChannel = "release"; }
   ];
 
   trackedProducts = [
@@ -245,7 +249,7 @@ rec {
     (map (variant: let
       resolved = (vsPackages {
         version = variant.versionMajor;
-        versionPreview = variant.versionPreview or false;
+        inherit (variant) versionChannel;
       }).resolve {
         inherit (variant) product packageIds;
         includeRecommended = true;
@@ -272,10 +276,10 @@ rec {
       (map (version: let
         packages = vsPackages {
           version = version.versionMajor;
-          versionPreview = version.versionPreview or false;
+          inherit (version) versionChannel;
         };
       in lib.nameValuePair version.versionMajor {
-        versionPreview = version.versionPreview or false;
+        preview = version.preview or false;
         channelUrl = packages.actualChannelUrl;
         manifestUrl = packages.manifestDesc.url;
         version = lib.head (lib.split " " packages.channelManifestJSON.info.productDisplayVersion);
@@ -295,7 +299,7 @@ rec {
     newFixeds = let
       keptFetchurls = lib.filterAttrs (url: obj: let
         change = changeForObj obj;
-      in change == null || !(change.versionPreview or false)) fixeds.fetchurl;
+      in change == null || !change.preview) fixeds.fetchurl;
       newFetchurlsChannels = lib.mapAttrs' (_versionMajor: { version, channelUrl, ... }: lib.nameValuePair channelUrl (fixeds.fetchurl."${channelUrl}" or {} // {
         comment = version;
       })) changedMajorVersions;
@@ -308,7 +312,7 @@ rec {
     newFixedsFile = pkgs.writeText "fixeds.json" (builtins.toJSON newFixeds);
     newVersionsInfo = versionsInfo // {
       channels = lib.pipe changedMajorVersions [
-        (lib.filterAttrs (_versionMajor: { versionPreview, ... }: !versionPreview))
+        (lib.filterAttrs (_versionMajor: { preview, ... }: !preview))
         (lib.mapAttrs' (_versionMajor: { version, channelUrl, ... }: lib.nameValuePair version channelUrl))
         (changes: versionsInfo.channels // changes)
       ];
