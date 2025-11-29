@@ -173,7 +173,7 @@ rec {
 
       disk = coil.toolchain-windows.runPackerStep {
         name = "${name}_disk-${version}";
-        disk = coil.toolchain-windows.initialDisk {};
+        disk = coil.toolchain-windows.windows.initialDisk;
         extraMount = "work";
         extraMountOut = false;
         beforeScript = ''
