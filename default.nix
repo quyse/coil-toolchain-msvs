@@ -236,28 +236,6 @@ rec {
     { versionMajor = "15"; versionChannel = "release"; }
   ];
 
-  trackedProducts = [
-    {
-      product = "Microsoft.VisualStudio.Product.BuildTools";
-      packageIds = ["Microsoft.VisualStudio.Workload.VCTools"];
-    }
-  ];
-
-  trackedVariants = lib.concatMap (version: map (product: version // product) trackedProducts) trackedVersions;
-
-  trackedDisks = lib.pipe trackedVariants [
-    (map (variant: let
-      resolved = (vsPackages {
-        version = variant.versionMajor;
-        inherit (variant) versionChannel;
-      }).resolve {
-        inherit (variant) product packageIds;
-        includeRecommended = true;
-      };
-    in lib.nameValuePair "${resolved.name}-${resolved.version}" resolved.disk))
-    lib.listToAttrs
-  ];
-
   allManifests = lib.pipe versionsInfo.channels [
     (lib.mapAttrsToList (version: _channelUrl: let
       packages = vsPackages {
@@ -347,7 +325,7 @@ rec {
     fi
   '';
 
-  touch = trackedDisks // {
+  touch = {
     inherit autoUpdateScript allManifests;
   };
 }
