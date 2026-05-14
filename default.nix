@@ -93,7 +93,8 @@ rec {
             (if packageVariant.language or null != null then ",language=${packageVariant.language}" else "") +
             (if packageVariant.branch or null != null then ",branch=${packageVariant.branch}" else "") +
             (if packageVariant.productArch or null != null then ",productarch=${packageVariant.productArch}" else "") +
-            (if packageVariant.machineArch or null != null then ",machinearch=${packageVariant.machineArch}" else "");
+            (if packageVariant.machineArch or null != null then ",machinearch=${packageVariant.machineArch}" else "") +
+            (if packageVariant.sdk or null != null then ",sdk=${packageVariant.sdk}" else "");
           # map of payloads, fileName -> fetchurl derivation
           payloads = lib.pipe (packageVariant.payloads or []) [
             (map payloadManifest)
