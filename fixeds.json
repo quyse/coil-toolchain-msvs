@@ -29,32 +29,32 @@
       "url": "https://download.visualstudio.microsoft.com/download/pr/173680e6-f352-4b2b-975f-96e006bf9720/0F0CC11F000593A064D419462A8467B529FED8075B21A605A40785BAA3D2F611/vs_installer.opc"
     },
     "https://aka.ms/vs/17/release/channel": {
-      "etag": "\"0x37BEE30093CAECC342032BC89E3DE26CD02D4211F2D5276EB2F40E3F702F196D\"",
-      "last-modified": "Sat, 02 May 2026 02:42:57 GMT",
+      "etag": "\"0x033C631A0FE992BE0ED59FCC2FE0F8791CB3EF92F5A422FEE549194D931BD181\"",
+      "last-modified": "Fri, 15 May 2026 00:55:53 GMT",
       "name": "VisualStudio.17.Release.chman",
-      "sha256": "0cpsv7hn5cir91vbp3cjpccbvqs6lsfr0x0v8ih8hwpb1a0i7b79",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/32cfc04d-a165-47db-a247-618c1efc2c76/b1143e844a7066b4ae4c390f1d8deb7518d1240c955515bc69e325863f2fc176/VisualStudio.17.Release.chman"
+      "sha256": "1i81xm1ak1mymwckxjks7k9m382224a92bpnf6wqydfanvsqf3fx",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/d3ea0f65-e303-451a-956d-2525aafc8aeb/05975f91d5d61827d42115079d91e110345a36f2f70f7cbe68193f0c8ec50e7b/VisualStudio.17.Release.chman"
     },
     "https://aka.ms/vs/17/release/installer": {
-      "etag": "\"0xC49366084AF837865873E7C829EB1AD92EFBEC4294D4F32E403FB429FD62EA18\"",
-      "last-modified": "Sat, 02 May 2026 01:53:22 GMT",
+      "etag": "\"0xAFCCCBD9F9E1F632CE6517A87BFC159EC0B2CB6B342E49FB4B23C2DBDAAF4D01\"",
+      "last-modified": "Fri, 15 May 2026 00:10:52 GMT",
       "name": "vs_installer.opc",
-      "sha256": "1c5yzldwfmj5y03997ydlddrb2nbhn7apns5x83dwy16yvvbiv7p",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/32cfc04d-a165-47db-a247-618c1efc2c76/F7ECB8F6F62678DE06EA45DBAB8E85CB8A955BA3CD9F9406F04556C71BFDBEB0/vs_installer.opc"
+      "sha256": "01av8s8lqrjj5qgwia8sjipmm7x1h6fgvyriljyfxn8d24sfi180",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/d3ea0f65-e303-451a-956d-2525aafc8aeb/0085E834110DD9EEBCA431FBFD9C81A19F5A6F941AA9C81F2E52664C91465B05/vs_installer.opc"
     },
     "https://aka.ms/vs/18/stable/channel": {
-      "etag": "\"0xF60F181B5BDD182ABFAAA245DD4C327921056C5C2C5F99BC830A9E4A201AFB71\"",
-      "last-modified": "Thu, 07 May 2026 02:05:04 GMT",
+      "etag": "\"0x916BECA271A15072DBA1DD6413868D47A9881DE89A105614D5B37DF232231728\"",
+      "last-modified": "Wed, 20 May 2026 00:29:11 GMT",
       "name": "VisualStudio.18.Release.chman",
-      "sha256": "1qbchwi3gjpf4sk669p49m0i2dq4nq7g6p7phbz2pzppzccs3ykp",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/c40d2503-2e56-4f54-96c2-d886056cfedb/4b49ca5c69b566aa495a772a16a23dd44c7e696d75a5524eaac5d268bf044712/VisualStudio.18.Release.chman"
+      "sha256": "1drpicsi6ssqlkw2pdznarm8w0ifdcg961f2nfvkpq08zpi430ry",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/3cfffe1b-b712-451e-9a6a-536ff231eb4b/ed27dce518aa34885b5de1be6845e861bd7dd7a66aacd58133bfdbc5f1c850b6/VisualStudio.18.Release.chman"
     },
     "https://aka.ms/vs/18/stable/installer": {
-      "etag": "\"0x6B0B1DF99B5967694032EF13E16EB1DEEE45963CD491AC3D4BE5C5970D18090F\"",
-      "last-modified": "Thu, 07 May 2026 01:04:16 GMT",
+      "etag": "\"0x53B78DB09E2CAE02E398F307AF99F9516260770E12C69C0B2FD0F45D4DDFE1AB\"",
+      "last-modified": "Tue, 19 May 2026 23:29:10 GMT",
       "name": "vs_installer.opc",
-      "sha256": "0gz0p1ah8zx3qfyfjqkkcz2bys15gac9sb50pxg2njhz7pzqbnd4",
-      "url": "https://download.visualstudio.microsoft.com/download/pr/c40d2503-2e56-4f54-96c2-d886056cfedb/A4D985FF3D1F4A2B5EBFA02C9D987A2568BFC4677362E9BCC3A37F0455B8E03F/vs_installer.opc"
+      "sha256": "12vry3n6ngc0xda7zsgcn8ipcrnm4qjaqdjlvmm84zhlbbp50v4h",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/3cfffe1b-b712-451e-9a6a-536ff231eb4b/906C50EE5A147E826ADD5436AC2426D5667623B2ECE97F54EB803D6BECF0798B/vs_installer.opc"
     },
     "https://download.visualstudio.microsoft.com/download/pr/0062cf19-350e-4e71-9d4d-af0557a5b273/605bef41bed7fd3ca8192d9e70be1a49b52b944ec17e37fe518f026fd6d4a4fe/VisualStudio.vsman": {
       "comment": "15.9.70",
@@ -1031,6 +1031,22 @@
       "name": "VisualStudio.17.Release.chman",
       "sha256": "0wmhh85ggkhq704kqy66zfsmdavndpjrkmxs67yw2376nfl5n4wh",
       "url": "https://download.visualstudio.microsoft.com/download/pr/3b6ddbf8-a147-4435-a494-52ca53c1322f/eaaa3355cad895564a6d14377207e51c9bb0352432f929afd5117f1292c7448a/VisualStudio.17.Release.chman"
+    },
+    "https://download.visualstudio.microsoft.com/download/pr/3cfffe1b-b712-451e-9a6a-536ff231eb4b/1f8e2f733d17ea6928ca49459ca92003ebe64cec288c025911141680efafc9e8/VisualStudio.vsman": {
+      "comment": "18.6.1",
+      "etag": "\"0x45680A7694C7E9F2902CE70B25E634D04B611F07D8CD7698A60B6EC51CFEC421\"",
+      "last-modified": "Wed, 20 May 2026 00:29:11 GMT",
+      "name": "VisualStudio.vsman",
+      "sha256": "17df1mrgij8gpxkd6lx8w200ycqvi6mqh08k0f86mcb79kzaajiv",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/3cfffe1b-b712-451e-9a6a-536ff231eb4b/1f8e2f733d17ea6928ca49459ca92003ebe64cec288c025911141680efafc9e8/VisualStudio.vsman"
+    },
+    "https://download.visualstudio.microsoft.com/download/pr/3cfffe1b-b712-451e-9a6a-536ff231eb4b/ed27dce518aa34885b5de1be6845e861bd7dd7a66aacd58133bfdbc5f1c850b6/VisualStudio.18.Release.chman": {
+      "comment": "18.6.1",
+      "etag": "\"0x916BECA271A15072DBA1DD6413868D47A9881DE89A105614D5B37DF232231728\"",
+      "last-modified": "Wed, 20 May 2026 00:29:11 GMT",
+      "name": "VisualStudio.18.Release.chman",
+      "sha256": "1drpicsi6ssqlkw2pdznarm8w0ifdcg961f2nfvkpq08zpi430ry",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/3cfffe1b-b712-451e-9a6a-536ff231eb4b/ed27dce518aa34885b5de1be6845e861bd7dd7a66aacd58133bfdbc5f1c850b6/VisualStudio.18.Release.chman"
     },
     "https://download.visualstudio.microsoft.com/download/pr/3d3a1530-b8e4-4e76-822c-4cc60b7571b0/0f46ad75fde51dced8318a74aa3782513082321f2a72f21d4da7d261e6e5e45e/VisualStudio.vsman": {
       "comment": "15.9.42",
@@ -3399,6 +3415,22 @@
       "name": "VisualStudio.vsman",
       "sha256": "1x6fyx0lls6mdkjaah8apd8ksalb80mf4jkh8r9amc9qd5x6v4k4",
       "url": "https://download.visualstudio.microsoft.com/download/pr/d3b4e0f6-4bc0-4ec0-ba9c-20b355d61cc4/ccd546b5752c6afac8992e5810260d4cbc52192108a1b70390604fa14b4329d1/VisualStudio.vsman"
+    },
+    "https://download.visualstudio.microsoft.com/download/pr/d3ea0f65-e303-451a-956d-2525aafc8aeb/05975f91d5d61827d42115079d91e110345a36f2f70f7cbe68193f0c8ec50e7b/VisualStudio.17.Release.chman": {
+      "comment": "17.14.33",
+      "etag": "\"0x033C631A0FE992BE0ED59FCC2FE0F8791CB3EF92F5A422FEE549194D931BD181\"",
+      "last-modified": "Fri, 15 May 2026 00:55:53 GMT",
+      "name": "VisualStudio.17.Release.chman",
+      "sha256": "1i81xm1ak1mymwckxjks7k9m382224a92bpnf6wqydfanvsqf3fx",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/d3ea0f65-e303-451a-956d-2525aafc8aeb/05975f91d5d61827d42115079d91e110345a36f2f70f7cbe68193f0c8ec50e7b/VisualStudio.17.Release.chman"
+    },
+    "https://download.visualstudio.microsoft.com/download/pr/d3ea0f65-e303-451a-956d-2525aafc8aeb/9393558b61af9d0727eb57ac29cf7a2bda05e81b962f31899e7106eeffff61a4/VisualStudio.vsman": {
+      "comment": "17.14.33",
+      "etag": "\"0x7266B074C4C0786270C595024F42F4FF7AC5BB086B88379879459A8201687DCD\"",
+      "last-modified": "Fri, 15 May 2026 00:55:53 GMT",
+      "name": "VisualStudio.vsman",
+      "sha256": "0f344jibca0b1x4vvryxn6xy4xisqma618mwf2g0c0xwnfh8xszp",
+      "url": "https://download.visualstudio.microsoft.com/download/pr/d3ea0f65-e303-451a-956d-2525aafc8aeb/9393558b61af9d0727eb57ac29cf7a2bda05e81b962f31899e7106eeffff61a4/VisualStudio.vsman"
     },
     "https://download.visualstudio.microsoft.com/download/pr/d4c27f3a-2cee-4907-99e3-aa5abafc38c1/1c2e313bb302729a4108cfc149ee7cc3e7729125dd76dbceb684a4dafd38764d/VisualStudio.16.Release.chman": {
       "comment": "16.11.40",
